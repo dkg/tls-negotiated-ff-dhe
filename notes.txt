@@ -1,0 +1,37 @@
+2013-12-06 09:35:32-0500
+------------------------
+
+writing draft for TLS negotiated DH parameters.
+
+ * decide on ipr statement
+
+ * problem statement:
+
+   servers have no way to know that a client supports strong DHE.
+   some widely deployed TLS clients only support 1024-bit DHE, and
+   servers have no way of knowing if a connecting client is in that
+   class.
+
+   clients have no recourse if offered a bad set of DH parameters
+   other than terminating the connection.
+
+   clients also have no effective way of knowing if the DH parameters
+   they've been offered has reasonable security properties.  some
+   current clients test the size of P, but that's it -- i haven't
+   found one that does primality testing, and no one should hvae to do
+   primality testing on each DHE handshake.
+
+
+ * I want:
+
+   Clients to be able to advertise their support for strong groups
+
+   Clients to be able to indicate their minimum level of cryptographic
+   requirements for DH parameter selection
+
+   Servers to be able to offer strong groups with confidence that
+   their peer will not need to terminate the handshake
+
+   Clients to have a low-cost mechanism for ensuring that the group
+   chosen by the server meets their cryptographic expectations
+
