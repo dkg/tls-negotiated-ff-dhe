@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="US-ASCII"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- This template is for creating an Internet Draft using xml2rfc,
      which is available here: http://xml.resource.org. -->
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
@@ -8,7 +8,9 @@
 
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2629.xml">
+<!ENTITY RFC2631 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2631.xml">
 <!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
+<!ENTITY RFC5246 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml">
 <!ENTITY I-D.narten-iana-considerations-rfc2434bis SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.narten-iana-considerations-rfc2434bis.xml">
 ]>
 
@@ -49,56 +51,29 @@
     <!-- The abbreviated title is used in the page header - it is only necessary if the 
          full title is longer than 39 characters -->
 
-    <title abbrev="Abbreviated Title">Put Your Internet Draft Title
-    Here</title>
+    <title abbrev="Negotiated-DL-DHE-for-TLS">Negotiated Discrete Log Diffie-Hellman Ephemeral Parameters for TLS</title>
 
     <!-- add 'role="editor"' below for the editors if appropriate -->
 
     <!-- Another author who claims to be an editor -->
 
-    <author fullname="Elwyn Davies" initials="E.B." role="editor"
-            surname="Davies">
-      <organization>Folly Consulting</organization>
-
+    <author fullname="Daniel Kahn Gillmor" initials="D.K.G." surname="Gillmor">
+      <organization>Independent</organization>
       <address>
         <postal>
           <street></street>
-
-          <!-- Reorder these if your country does things differently -->
-
-          <city>Soham</city>
-
-          <region></region>
-
+          <city>Brooklyn</city>
+          <region>NY</region>
           <code></code>
-
-          <country>UK</country>
+          <country>USA</country>
         </postal>
-
-        <phone>+44 7889 488 335</phone>
-
-        <email>elwynd@dial.pipex.com</email>
-
+        <phone></phone>
+        <email>dkg@fifthhorseman.net</email>
         <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
 
-    <!-- for testing trac #189 -->
-    <author fullname="Quintin Zhao" surname="Quintin Zhao">
-      <organization>Huawei Technology</organization>
-      <address>
-	<postal>
-	  <street>125 Nagog Technology Park</street>
-	  <city>Acton</city>
-	  <region>MA</region>
-	  <code>01719</code>
-	  <country>US</country>
-	</postal>
-	<email>quintin.zhao@huawei.com</email>
-      </address>
-    </author>
-
-    <date month="March" year="2007" />
+    <date month="February" year="2014" />
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
          in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -118,7 +93,7 @@
 	 If this element is not present, the default is "Network Working Group",
          which is used by the RFC Editor as a nod to the history of the IETF. -->
 
-    <keyword>template</keyword>
+    <keyword>Diffie-Hellman, TLS, Negotiation, Extensions</keyword>
 
     <!-- Keywords will be incorporated into HTML output
          files in a meta tag but they have no effect on text or nroff
@@ -126,15 +101,57 @@
          keywords will be used for the search engine. -->
 
     <abstract>
-      <t>Insert an abstract: MANDATORY. This template is for creating an
-      Internet Draft.</t>
+      <t>Traditional discrete logarithm-based Diffie-Hellman (DH) key
+      exchange during the TLS handshake suffers from a number of
+      security, interoperability, and efficiency shortcomings.  These
+      shortcomings arise from lack of clarity about which DH group
+      parameters TLS servers should offer and clients should accept.
+      This document offers a solution to these shortcomings for
+      compatible peers by establishing a registry of DH parameters
+      with known structure and a mechanism for peers to indicate
+      support for these groups.</t>
     </abstract>
   </front>
 
   <middle>
     <section title="Introduction">
-      <t>The original specification of xml2rfc format is in <xref
-      target="RFC2629">RFC&nbsp;2629</xref>.</t>
+      <t>Traditional <xref target="RFC5246">TLS</xref> offers a
+      Diffie-Hellman ephemeral (DHE) key exchange mode which provides
+      Perfect Forward Secrecy for the connection.  The client offers a
+      ciphersuite in the ClientHello that includes DHE, and the server
+      offers the client group parameters g and p.  If the client does
+      not consider the group strong enough (e.g. if p is too small, or
+      if p is not prime, or there are small subgroups), or if it is
+      unable to process it for other reasons, it has no recourse but
+      to terminate the connection.</t>
+
+      <t>Conversely, when a TLS server receives a suggestion for a DHE
+      ciphersuite from a client, it has no way of knowing what kinds
+      of DH groups the client is capable of handling, or what the
+      client's security requirements are for this key exchange
+      session.  Some widely-distributed TLS clients are not capable of
+      DH groups where p > 1024.  Other TLS clients may by policy wish
+      to use DHE only if the server can offer a stronger group (and
+      are willing to use a non-PFS key-exchange mechanism otherwise).
+      The server has no way of knowing which type of client is
+      connecting, but must select DHE parameters with insufficient
+      knowledge.</t>
+
+      <t>Additionally, the DH parameters chosen by the server may have
+      a known structure which renders them secure against small
+      subgroup attack, but a client receiving an arbitrary p has no
+      efficient way to verify that the structure of a new group is
+      reasonable for use.</t>
+
+      <t>This extension solves these problems with a registry of
+      groups of known reasonable structure, an extension for clients
+      to advertise support for them and servers to select them, and
+      guidance for compliant peers to take advantage of the additional
+      security, availability, and efficiency offered.</t>
+
+      <t>The use of this extension by one compliant peer when
+      interacting with a non-compliant peer should have no detrimental
+      effects.</t>
 
       <section title="Requirements Language">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -144,328 +161,298 @@
       </section>
     </section>
 
-    <section anchor="simple_list" title="Simple List">
-      <t>List styles: 'empty', 'symbols', 'letters', 'numbers', 'hanging',
-      'format'.</t>
+    <section anchor="client" title="Client Behavior">
+      <t>A TLS client that is capable of using strong discrete log
+      Diffie-Hellman groups can advertise its capabilities and its
+      preferences for stronger key exchange by using this
+      mechanism.</t>
 
-      <t><list style="symbols">
-          <t>First bullet</t>
+      <t>The client SHOULD send an extension of type
+      "negotiated_dl_dhe_groups" in the ClientHello, indicating an
+      list of known and acceptable traditional discrete log
+      Diffie-Hellman groups, ordered from most preferred to least
+      preferred.</t>
 
-          <t>Second bullet</t>
-        </list> You can write text here as well.</t>
-    </section>
+      <t>The "extension_data" field of this extension SHALL contain
+      "DiscreteLogDHEGroups" where:
 
-    <section title="Figures">
-      <t>Figures should not exceed 69 characters wide to allow for the indent
-      of sections.</t>
-
-      <figure align="center" anchor="xml_happy">
-        <preamble>Preamble text - can be omitted or empty.</preamble>
-
-        <artwork align="left"><![CDATA[
-+-----------------------+
-| Use XML, be Happy :-) |
-|_______________________|
-            ]]></artwork>
-
-        <postamble>Cross-references allowed in pre- and postamble. <xref
-        target="min_ref" />.</postamble>
-      </figure>
-
-      <t>The CDATA means you don't need to escape meta-characters (especially
-      &lt;&nbsp;(&amp;lt;) and &amp;&nbsp;(&amp;amp;)) but is not essential.
-      Figures may also have a title attribute but it won't be displayed unless
-      there is also an anchor. White space, both horizontal and vertical, is
-      significant in figures even if you don't use CDATA.</t>
-    </section>
-
-    <!-- This PI places the pagebreak correctly (before the section title) in the text output. -->
-
-    <?rfc needLines="8" ?>
-
-    <section title="Subsections and Tables">
-      <section title="A Subsection">
-        <t>By default 3 levels of nesting show in table of contents but that
-        can be adjusted with the value of the "tocdepth" processing
-        instruction.</t>
-      </section>
-
-      <section title="Tables">
-        <t>.. are very similar to figures:</t>
-
-        <texttable anchor="table_example" title="A Very Simple Table">
-          <preamble>Tables use ttcol to define column headers and widths.
-          Every cell then has a "c" element for its content.</preamble>
-
-          <ttcol align="center">ttcol #1</ttcol>
-
-          <ttcol align="center">ttcol #2</ttcol>
-
-          <c>c #1</c>
-
-          <c>c #2</c>
-
-          <c>c #3</c>
-
-          <c>c #4</c>
-
-          <c>c #5</c>
-
-          <c>c #6</c>
-
-          <postamble>which is a very simple example.</postamble>
-        </texttable>
-      </section>
-    </section>
-
-    <section anchor="nested_lists" title="More about Lists">
-      <t>Lists with 'hanging labels': the list item is indented the amount of
-      the hangIndent: <list hangIndent="8" style="hanging">
-          <t hangText="short">With a label shorter than the hangIndent.</t>
-
-          <t hangText="fantastically long label">With a label longer than the
-          hangIndent.</t>
-
-          <t hangText="vspace_trick"><vspace blankLines="0" />Forces the new
-          item to start on a new line.</t>
-        </list></t>
-
-      <!-- It would be nice to see the next piece (12 lines) all on one page. -->
-
-      <?rfc needLines="12" ?>
-
-      <t>Simulating more than one paragraph in a list item using
-      &lt;vspace&gt;: <list style="letters">
-          <t>First, a short item.</t>
-
-          <t>Second, a longer list item.<vspace blankLines="1" /> And
-          something that looks like a separate pararaph..</t>
-        </list></t>
-
-      <t>Simple indented paragraph using the "empty" style: <list
-          hangIndent="10" style="empty">
-          <t>The quick, brown fox jumped over the lazy dog and lived to fool
-          many another hunter in the great wood in the west.</t>
-        </list></t>
-
-      <section title="Numbering Lists across Lists and Sections">
-        <t>Numbering items continuously although they are in separate
-        &lt;list&gt; elements, maybe in separate sections using the "format"
-        style and a "counter" variable.</t>
-
-        <t>First list: <list counter="reqs" hangIndent="4" style="format R%d">
-            <t>#1</t>
-
-            <t>#2</t>
-
-            <t>#3</t>
-          </list> Specify the indent explicitly so that all the items line up
-        nicely.</t>
-
-        <t>Second list: <list counter="reqs" hangIndent="4" style="format R%d">
-            <t>#4</t>
-
-            <t>#5</t>
-
-            <t>#6</t>
-          </list></t>
-      </section>
-
-      <section title="Where the List Numbering Continues">
-        <t>List continues here.</t>
-
-        <t>Third list: <list counter="reqs" hangIndent="4" style="format R%d">
-            <t>#7</t>
-
-            <t>#8</t>
-
-            <t>#9</t>
-
-            <t>#10</t>
-          </list> The end of the list.</t>
-      </section>
-      <section title="nested lists">
-	<t>Simulating more than one paragraph in a list item using
-	  &lt;vspace&gt;: 
-	  <list style="letters">
-	    <t>First, a short item.</t>
-
-	    <t>Second, a longer list item.<vspace blankLines="1" /> And
-	      something that looks like a separate paragraph.</t>
-
-	    <t>and a sublist, also with letters
-	      <list>
-		<t>first subitem</t>
-		<t>second subitem</t>
-		<t>and a sub-sublist, also with letters
-		  <list>
-		    <t>first sub-subitem</t>
-		    <t>second sub-subitem</t>
-		  </list>
-		</t>
-	      </list>
-	    </t>
-	  </list>
-	</t>
-      </section>
-      <section title="List Formats">
-	<t>many formats
-	  <list style="format %c">
-	    <t>first %c-item</t>
-	    <t>more %c-items</t>
-	  </list>
-	  <list style="format %C">
-	    <t>first %C-item</t>
-	    <t>more %C-items</t>
-	  </list>
-	  <list style="format %d">
-	    <t>first %d-item.</t>
-	    <t>more %d-items.</t>
-	  </list>
-	  <list style="format %i">
-	    <t>first %i-item</t>
-	    <t>more %i-items</t>
-	    <t>more %i-items</t>
-	    <t>more %i-items</t>
-	    <t>more %i-items</t>
-	    <t>more %i-items</t>
-	    <t>more %i-items</t>
-	    <t>more %i-items</t>
-	    <t>more %i-items</t>
-	  </list>
-	  <list style="format %I">
-	    <t>first %I-item</t>
-	    <t>more %I-items</t>
-	    <t>more %I-items</t>
-	    <t>more %I-items</t>
-	    <t>more %I-items</t>
-	    <t>more %I-items</t>
-	    <t>more %I-items</t>
-	    <t>more %I-items</t>
-	    <t>more %I-items</t>
-	  </list>
-	  <list style="format %o">
-	    <t>first %o-item</t>
-	    <t>more %o-items</t>
-	    <t>more %o-items</t>
-	    <t>more %o-items</t>
-	    <t>more %o-items</t>
-	    <t>more %o-items</t>
-	    <t>more %o-items</t>
-	    <t>more %o-items</t>
-	    <t>more %o-items</t>
-	  </list>
-	  <list style="format %x">
-	    <t>first %x-item</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	    <t>more %x-items</t>
-	  </list>
-	  <list style="format %X">
-	    <t>first %X-item</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	    <t>more %X-items</t>
-	  </list>
-	</t>
-      </section>
-    </section>
-
-    <section anchor="codeExample"
-             title="Example of Code or MIB Module To Be Extracted">
       <figure>
-        <preamble>The &lt;artwork&gt; element has a number of extra attributes
-        that can be used to substitute a more aesthetically pleasing rendition
-        into HTML output while continuing to use the ASCII art version in the
-        text and nroff outputs (see the xml2rfc README for details). It also
-        has a "type" attribute. This is currently ignored except in the case
-        'type="abnf"'. In this case the "artwork" is expected to contain a
-        piece of valid Augmented Backus-Naur Format (ABNF) grammar. This will
-        be syntax checked by xml2rfc and any errors will cause a fatal error
-        if the "strict" processing instruction is set to "yes". The ABNF will
-        also be colorized in HTML output to highlight the syntactic
-        components. Checking of additional "types" may be provided in future
-        versions of xml2rfc.</preamble>
-
         <artwork><![CDATA[
+      enum {
+          dldhe2048(0), dldhe3072(1), dldhe4096(2), dldhe6144(3),
+          dldhe8192(4),  (255)
+      } DiscreteLogDHEGroup;
 
-/**** an example C program */
-
-#include <stdio.h>
-
-void
-main(int argc, char *argv[])
-{
-    int i;
-
-    printf("program arguments are:\n");
-    for (i = 0; i < argc; i++) {
-        printf("%d: \"%s\"\n", i, argv[i]);
-    }
-
-    exit(0);
-} /* main */
-
-/* end of file */
-
+      struct {
+          DiscreteLogDHEGroup discrete_log_dhe_group_list<1..2^8-1>;
+      } DiscreteLogDHEGroups;
             ]]></artwork>
       </figure>
+
+      <t>A client that offers this extension SHOULD include at least
+      one DHE-key-exchange ciphersuite in the Client Hello.</t>
+
+      <t>The known groups defined by the DiscreteLogDHEGroup registry
+      refer to the primes referenced in the "Oakley" groups listed by
+      size in RFC 3526.  These are all safe primes, generated from the
+      hexadecimal expansion of pi, bracketed with 64 "1" bits on
+      either side. While RFC 3526 uses a generator of 2 for each group
+      (often creating a group of order (p-1)/2), these named groups
+      choose the lowest generator that creates a group of order p-1.
+      (XXX There does not seem to be an explicit IANA registry of
+      these groups, and the ids referred to in RFC 3526 appear to be
+      intermixed with elliptic curve DH groups according to
+      https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2CipherSuites#Diffie-Hellman-Groups
+      so a new registry seems to be needed.  XXX)</t>
+
+      <t>A client who offers a group MUST be able and willing to
+      perform a DH key exchange using that group.</t>
     </section>
+    <section anchor="server" title="Server Behavior">
+      <t>A TLS server MUST NOT send the NegotiatedDHParams extension
+      to a client that does not offer it first.
+      </t>
+
+      <t>A compatible TLS server that receives this extension from a
+      client SHOULD NOT select a DHE ciphersuite if it is unwilling to
+      use one of the DH groups named by the client.  In this case, it
+      SHOULD select an acceptable non-DHE ciphersuite from the
+      client's offered list.  If the extension is present, none of the
+      client's offered groups are acceptable by the server, and none
+      of the client's proposed non-DHE ciphersuites are acceptable to
+      the server, the server SHOULD end the connection with a fatal
+      TLS alert of type insufficient_security.
+      </t>
+      
+      <t>A compatible TLS server that receives this extension from a
+      client and selects a DHE-key-exchange ciphersuite selects one of
+      the offered groups and indicates it to the client in the
+      ServerHello by sending a "negotiated_dl_dhe_groups" extension.
+      The "extension_data" field of this extension on the server side
+      should be a single one-byte value DiscreteLogDHEGroup.
+      </t>
+
+      <t>A TLS server MUST NOT select a named group that was not
+      offered by the client.
+      </t>
+
+      <t>When the server sends the "negotiated_dl_dhe_groups"
+      extension in the ServerHello, the ServerDHParams member of the
+      subsequent ServerKeyExchange message should indicate a one-byte
+      zero value (0) in place of dh_g and the identifier of the named
+      group in place of dh_p, represented as a one-byte value.  dh_Ys
+      must be transmitted as normal.
+      </t>
+
+      <t>This re-purposing of dh_p and dh_g is unambiguous: there are
+      no groups with a generator of 0, and no implementation should
+      accept a modulus of size &lt; 8 bits.  This change serves two
+      purposes:
+
+      <list>
+        <t>The size of the handshake is is reduced (significantly, in
+        the case of a large prime modulus).</t>
+        <t>The signed struct should not be re-playable in a subsequent
+        key exchange that does not indicate named DH groups.</t>
+      </list>
+
+      </t>
+    </section>
+    <section anchor="optimizations" title="Optimizations">
+      <t>In a successful negotiated discrete log DH group, both peers
+      know that the group in question uses a safe prime as a modulus,
+      and that the group in use is of size p-1.  This allows at least
+      two optimizations that can be used to improve performance.
+      </t>
+      <section anchor="peercheck" title="Checking the Peer's Public Key">
+        <t>Peers should validate the each other's public key Y
+        (dh_Ys offered by the server or DH_Yc offered by the client) by
+        ensuring that 1 &lt; Y &lt; p-1.  This simple check ensures that
+        the remote peer is properly behaved and isn't forcing the local
+        system into a small subgroup.</t>
+
+        <t>To reach the same assurance with an unknown group, the
+        client would need to verify the primality of the modulus,
+        learn its factors, and test Y against each of its factors.
+        </t>
+      </section>
+      <section anchor="shortexponent" title="Short Exponents">
+        <t>
+          Traditional Discrete Log Diffie-Hellman has each peer choose
+          their secret exponent from the range [2,p-2].  Using
+          exponentiation by squaring, this means each peer must do
+          roughly 2*log_2(p) multiplications, twice (once for the
+          generator and once for the peer's public key).
+        </t>
+
+        <t>
+          Peers concerned with performance may also prefer to choose
+          their secret exponent from a smaller range, doing fewer
+          multiplications, while retaining the same level of overall
+          security.  Each named group indicates its approximate
+          security level, and provides a lower-bound on the range of
+          secret exponents that should preserve it.  For example,
+          rather than doing 2*2*2048 multiplications for a dldhe2048
+          handshake, each peer can choose to do 2*2*224
+          multiplications by choosing their secret exponent in the
+          range [2,2^224] and still keep the approximate 112-bit
+          security level.
+        </t>
+        <t>
+          A similar short-exponent approach is used in SSH's
+          Diffie-Hellman key exchange (See section 6.2 of RFC 4419).
+        </t>
+      </section>
+    </section>
+    <section anchor="questions" title="Open Questions">
+      <t>[This section should be removed, and questions resolved,
+      before any formalization of this draft]
+      </t>
+
+      <section title="Server Indication of support">
+        <t>Some servers will support this extension, but for whatever
+        reason decide to not negotiate a ciphersuite with DHE key
+        exchange at all.  Some possible reasons include:
+        <list>
+          <t>The client indicated that a server-supported non-DHE
+          ciphersuite was preferred over all DHE ciphersuites, and the
+          server honors that preference.</t>
+          <t>The server prefers a client-supported non-DHE ciphersuite
+          over all DHE ciphersuites, and selects it unilaterally.</t>
+          <t>The server would have chosen a DHE ciphersuite, but none
+          of the client's offered groups are acceptable to the
+          server,</t>
+        </list>
+
+        Clients will not know that such a server
+        supports the extension.</t>
+
+        <t>Should we offer a way for a server to indicate its support
+        for this extension to a compatible client in this case?</t>
+        
+        <t>Should the server have a way to advertise that it supports
+        this extension even if the client does not offer it?</t>
+      </section>
+      <section title="Weak Groups">
+        <t>Is there any reason to include a weak group in the list of
+        groups?  Most DHE-capable peers can already handle 1024-bit
+        DHE, and therefore 1024-bit DHE does not need to be
+        negotiated.  properly-chosen 2048-bit DH groups should offer
+        112-bit security.
+        </t>
+      </section>
+    </section>
+
+<!--
+
+guidance to servers for what to choose (choose based on trying to
+"balance" with other selected mechanisms, like server host pubkey and
+cipher and MAC?)
+
+guidance to clients for what to offer (offer based on acceptable
+cryptographic levels?)
+
+-->
+
+
 
     <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>This template was derived from an initial version written by Pekka
-      Savola and contributed by him to the xml2rfc project.</t>
-
-      <t>
-	This document is part of a plan to make xml2rfc indispensable <xref
-	target="DOMINATION"></xref>.
-	This document may be shared as needed <xref
-	target="SHARING"></xref>.
-      </t>
+      Thanks to Tom Ritter and Nikos Mavrogiannopolous and Niels
+      Möller for their comments and suggestions on the idea for this
+      draft.
     </section>
 
     <!-- Possibly a 'Contributors' section ... -->
 
     <section anchor="IANA" title="IANA Considerations">
-      <t>This memo includes no request to IANA.</t>
+      <t> This document defines a new TLS extension,
+      "negotiated_dh_group", assigned a value of XXX from the TLS
+      ExtensionType registry defined in <xref target="RFC5246">section
+      12 of RFC 5246</xref>.  This value is used as the extension
+      number for the extensions in both the client hello message and
+      the server hello message.  </t>
 
-      <t>All drafts are required to have an IANA considerations section (see
-      <xref target="I-D.narten-iana-considerations-rfc2434bis">the update of
-      RFC 2434</xref> for a guide). If the draft does not require IANA to do
-      anything, the section contains an explicit statement that this is the
-      case (as above). If there are no requirements for IANA, the section will
-      be removed during conversion into an RFC by the RFC Editor.</t>
-    </section>
+      <t>This extension also adds an additional indicator to each
+      named group in the <xref target="RFC3526">IKE DH groups</xref>,
+      indicating the advised strength of each group and whether it is
+      recommended for use in TLS.  These recommendations may be
+      updated by future revisions.</t>
+   </section>
 
     <section anchor="Security" title="Security Considerations">
-      <t>All drafts are required to have a security considerations section.
-      See <xref target="RFC3552">RFC 3552</xref> for a guide.</t>
+      <section title="Resistance to active attacks">
+        <t>Because the contents of this extension is hashed in the
+        finished message, an active MITM that tries to filter or omit
+        groups will cause the handshake to fail, but possibly not
+        before getting the peer to do something they would not
+        otherwise have done.</t>
+        <t>An attacker who impersonates the server can try to do the
+        following:
+        <list>
+          <t>Pretend that a non-compatible server is actually capable
+          of this extension, and select a group from the client's
+          list, causing the client to select a group it is willing to
+          negotiate.  It is unclear how this would be an effective
+          attack.</t>
+          <t>pretend that a compatible server is actually
+          non-compatible by negotiating a non-DHE ciphersuite. This is
+          no different than MITM ciphersuite filtering.</t>
+          <t>pretend that a compatible server is actually
+          non-compatible by negotiating a DHE ciphersuite and no
+          extension, with an explicit (perhaps weak) group chosen by
+          the server.  [XXX what are the worst consequences in this
+          case? what might the client leak before it notices that the
+          handshake fails? XXX]
+          </t>
+        </list>
+        </t>
+        <t>An attacker who impersonates the client can try to do the
+        following:
+        <list>
+          <t>Pretend that a compatible client is not compliant
+          (e.g. by not offering this extension).  This could cause the
+          server to negotiate a weaker DHE group during the handshake,
+          but it would fail to complete during the final check of the
+          Finished message.
+          </t>
+          <t>Pretend that a non-compatible client is compatible.  It
+          is not clear how this could be an attack.</t>
+          <t>Change the list of groups offered by the client (e.g. by
+          removing the stronger of the set of groups offered).  This
+          could cause the server to negotiate a weaker group than
+          desired, but again should be caught by the check in the
+          Finished message.
+          </t>
+        </list>
+        </t>
+      </section>
+      <section title="DHE only">
+        <t>Note that this extension specifically targets only discrete
+        log-based Diffie-Hellman ephemeral key exchange mechanisms.
+        It does not cover the non-ephemeral DH key exchange
+        mechanisms, nor does it cover elliptic curve-based DHE key
+        exchange, which has its own list of named groups.
+        </t>
+      </section>
+      <section title="Client fingerprinting">
+        <t>This extension provides a few additional bits of
+        information to distinguish between classes of TLS clients (see
+        e.g.  panopticlick).  To minimize this sort of fingerprinting,
+        clients SHOULD support all named groups at or above their
+        minimum security threshhold.  New named groups SHOULD NOT be
+        added to the registry without consideration of the cost of
+        browser fingerprinting.
+        </t>
+      </section>
+      <section title="Deprecating weak groups">
+        <t>Advances in hardware or in discrete log cryptanalysis may
+        cause some of the negotiated groups to not provide the desired
+        security margins, as indicated by number of years to protect
+        the premaster secret (and therefore the confidentiality and
+        integrity of the TLS session) against a powerful adversary.
+        The IANA registry for these named groups should clearly
+        indicate which groups are considered deprecated.</t>
+      </section>
     </section>
   </middle>
 
