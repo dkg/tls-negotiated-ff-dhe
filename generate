@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+
+import gmpy2
+
+# generate the MODP groups
+
+def find_generator(p):
+    '''find the lowest generator of a group of size p-1'''
+    g = 2
+    while True:
+        if gmpy2.powmod(g,(p-1)//2,p) != 1:
+            return g
+        g += 1
+
+def generate_prime(size):
+    '''return a group with a safe prime modulus of size bits'''
+    inner=(size-128)//8
+    if inner < 0 or inner * 8 + 128 != size:
+        raise Exception("you must provide an even multiple of 8 bits, plausibly large")
+    
+    gmpy2.get_context().precision=inner*8
+    pi_digits = gmpy2.mpz(gmpy2.const_pi(8*inner)*gmpy2.exp2(8*inner-2))
+    ones = gmpy2.mpz('0xffffffffffffffff')
+    offset = 0
+    while True:
+        candidate = (ones << (inner*8 + 64)) + ((pi_digits + offset) << 64) + ones
+        if gmpy2.is_prime(candidate):
+            sophie = (candidate - 1)//2
+            if gmpy2.is_prime(sophie):
+                return (offset, candidate, find_generator(candidate))
+                break
+        offset += 1
+
+for sz in [2048,3072,4096,6144,8192]:
+    (o,p,g) = generate_prime(sz)
+    print(sz, o, g, p.digits(16))
+
