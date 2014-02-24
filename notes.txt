@@ -35,3 +35,27 @@ writing draft for TLS negotiated DH parameters.
    Clients to have a low-cost mechanism for ensuring that the group
    chosen by the server meets their cryptographic expectations
 
+
+questions:
+----------
+
+how many bytes to use for the designated value?  1 bytes: values >
+200 are reserved for experimental/private use.  no endianness needed
+
+what is the reference to use for the IKE groups?  I don't see it
+listed at https://www.iana.org/protocols, despite the following two
+tables of modulus/generator groups:
+https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml#prime-generator-pairs
+https://www.iana.org/assignments/eap-eke/eap-eke.xhtml#diffie-hellman
+
+what about people who want DH > 8192?
+
+what to recommend for range of exponents?  each group should have:
+
+ generator
+ prime
+ secret range
+ expected strength
+
+ 
+
