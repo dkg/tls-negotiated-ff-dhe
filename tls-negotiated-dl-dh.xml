@@ -7,11 +7,9 @@
      An alternate method (rfc include) is described in the references. -->
 
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
-<!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2629.xml">
-<!ENTITY RFC2631 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2631.xml">
-<!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
+<!ENTITY RFC3526 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3526.xml">
+<!ENTITY RFC4419 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4419.xml">
 <!ENTITY RFC5246 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml">
-<!ENTITY I-D.narten-iana-considerations-rfc2434bis SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.narten-iana-considerations-rfc2434bis.xml">
 ]>
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -157,7 +155,7 @@
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
         "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
         document are to be interpreted as described in <xref
-        target="RFC2119">RFC 2119</xref>.</t>
+        target="RFC2119"/>.</t>
       </section>
     </section>
 
@@ -174,7 +172,7 @@
       preferred.</t>
 
       <t>The "extension_data" field of this extension SHALL contain
-      "DiscreteLogDHEGroups" where:
+      "DiscreteLogDHEGroups" where:</t>
 
       <figure>
         <artwork><![CDATA[
@@ -193,17 +191,20 @@
       one DHE-key-exchange ciphersuite in the Client Hello.</t>
 
       <t>The known groups defined by the DiscreteLogDHEGroup registry
-      refer to the primes referenced in the "Oakley" groups listed by
-      size in RFC 3526.  These are all safe primes, generated from the
-      hexadecimal expansion of pi, bracketed with 64 "1" bits on
-      either side. While RFC 3526 uses a generator of 2 for each group
-      (often creating a group of order (p-1)/2), these named groups
-      choose the lowest generator that creates a group of order p-1.
-      (XXX There does not seem to be an explicit IANA registry of
-      these groups, and the ids referred to in RFC 3526 appear to be
-      intermixed with elliptic curve DH groups according to
+      refer to the primes referenced by the Discrete Log "Oakley"
+      groups listed by size in <xref target="RFC3526"/>.  These are
+      all safe primes, generated from the hexadecimal expansion of pi,
+      bracketed with 64 "1" bits on either side. While <xref target="RFC3526"/> uses a
+      generator of 2 for each group (often creating a group of order
+      (p-1)/2), these named groups choose the lowest generator that
+      creates a group of order p-1.  (XXX There does not seem to be an
+      explicit IANA registry of these groups, and the ids referred to
+      in <xref target="RFC3526"/> appear to be intermixed with
+      elliptic curve DH groups according to
       https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2CipherSuites#Diffie-Hellman-Groups
-      so a new registry seems to be needed.  XXX)</t>
+      so a new registry seems to be needed, and will be created by
+      this document (see <xref target="named_group_registry"
+      />XXX)</t>
 
       <t>A client who offers a group MUST be able and willing to
       perform a DH key exchange using that group.</t>
@@ -300,7 +301,18 @@
         </t>
         <t>
           A similar short-exponent approach is used in SSH's
-          Diffie-Hellman key exchange (See section 6.2 of RFC 4419).
+          Diffie-Hellman key exchange (See section 6.2 of <xref
+          target="RFC4419"/>).
+        </t>
+      </section>
+      <section anchor="tableacceleration" title="Table Acceleration">
+        <t>
+          Peers wishing to further accelerate DHE key exchange can
+          also pre-compute a table of powers of the generator of a
+          known group.  This is a memory vs. time tradeoff, and it
+          only accelerates the first exponentiation of the DH exchange
+          (the exponentiation using the peer's public exponent as a
+          base still needs to be done as normal).
         </t>
       </section>
     </section>
@@ -333,12 +345,28 @@
         <t>Should the server have a way to advertise that it supports
         this extension even if the client does not offer it?</t>
       </section>
-      <section title="Weak Groups">
+      <section title="Normalizing Weak Groups">
         <t>Is there any reason to include a weak group in the list of
         groups?  Most DHE-capable peers can already handle 1024-bit
         DHE, and therefore 1024-bit DHE does not need to be
-        negotiated.  properly-chosen 2048-bit DH groups should offer
-        112-bit security.
+        negotiated.  Properly-chosen 2048-bit DH groups should be
+        roughly equivalent to 112-bit security.  And future
+        implementations should use sizes of at least 3072 bits
+        according to <xref target="ENISA"/>.
+        </t>
+      </section>
+      <section title="Arbitrary Groups">
+        <t>This spec currently doesn't indicate any support for groups
+        other than the named groups.  Other DHE specifications have
+        moved away from staticly-named groups with the
+        explicitly-stated rationale of reducing the incentive for
+        precomputation-driven attacks on any specific group
+        (e.g. section 1 of <xref target="RFC4419"/>).  If we instead
+        allow the server to propose arbitrary groups, we could make it
+        a MUST that the generated groups use safe prime moduli, while
+        still allowing clients to signal support (and desire) for
+        large groups.  This leaves the client in the position of
+        relying on the server to choose a strong modulus, though.
         </t>
       </section>
     </section>
@@ -354,104 +382,133 @@ cryptographic levels?)
 
 -->
 
-
-
     <section anchor="Acknowledgements" title="Acknowledgements">
-      Thanks to Tom Ritter and Nikos Mavrogiannopolous and Niels
-      Möller for their comments and suggestions on the idea for this
-      draft.
+      <t>
+        Thanks to Tom Ritter and Nikos Mavrogiannopolous and Niels
+        M&#246;ller for their comments and suggestions on the idea for
+        this draft.
+      </t>
     </section>
 
     <!-- Possibly a 'Contributors' section ... -->
 
     <section anchor="IANA" title="IANA Considerations">
-      <t> This document defines a new TLS extension,
-      "negotiated_dh_group", assigned a value of XXX from the TLS
-      ExtensionType registry defined in <xref target="RFC5246">section
-      12 of RFC 5246</xref>.  This value is used as the extension
-      number for the extensions in both the client hello message and
-      the server hello message.  </t>
+      <t>
+        This document defines a new TLS extension,
+        "negotiated_dh_group", assigned a value of XXX from the TLS
+        ExtensionType registry defined in section 12 of <xref
+        target="RFC5246"/>.  This value is used as the extension
+        number for the extensions in both the client hello message and
+        the server hello message.
+      </t>
 
-      <t>This extension also adds an additional indicator to each
-      named group in the <xref target="RFC3526">IKE DH groups</xref>,
-      indicating the advised strength of each group and whether it is
-      recommended for use in TLS.  These recommendations may be
-      updated by future revisions.</t>
+      <t>
+        This extension also defines a registry of TLS named Discrete
+        Log DH groups, derived initially from some of the <xref
+        target="RFC3526">IKE DH groups</xref>, indicating the advised
+        strength of each group and whether it is recommended for use
+        in TLS.  These recommendations may be updated by future
+        revisions.
+      </t>
    </section>
 
     <section anchor="Security" title="Security Considerations">
       <section title="Resistance to active attacks">
-        <t>Because the contents of this extension is hashed in the
-        finished message, an active MITM that tries to filter or omit
-        groups will cause the handshake to fail, but possibly not
-        before getting the peer to do something they would not
-        otherwise have done.</t>
-        <t>An attacker who impersonates the server can try to do the
-        following:
-        <list>
-          <t>Pretend that a non-compatible server is actually capable
-          of this extension, and select a group from the client's
-          list, causing the client to select a group it is willing to
-          negotiate.  It is unclear how this would be an effective
-          attack.</t>
-          <t>pretend that a compatible server is actually
-          non-compatible by negotiating a non-DHE ciphersuite. This is
-          no different than MITM ciphersuite filtering.</t>
-          <t>pretend that a compatible server is actually
-          non-compatible by negotiating a DHE ciphersuite and no
-          extension, with an explicit (perhaps weak) group chosen by
-          the server.  [XXX what are the worst consequences in this
-          case? what might the client leak before it notices that the
-          handshake fails? XXX]
-          </t>
-        </list>
+        <t>
+          Because the contents of this extension is hashed in the
+          finished message, an active MITM that tries to filter or
+          omit groups will cause the handshake to fail, but possibly
+          not before getting the peer to do something they would not
+          otherwise have done.
         </t>
-        <t>An attacker who impersonates the client can try to do the
-        following:
-        <list>
-          <t>Pretend that a compatible client is not compliant
-          (e.g. by not offering this extension).  This could cause the
-          server to negotiate a weaker DHE group during the handshake,
-          but it would fail to complete during the final check of the
-          Finished message.
-          </t>
-          <t>Pretend that a non-compatible client is compatible.  It
-          is not clear how this could be an attack.</t>
-          <t>Change the list of groups offered by the client (e.g. by
-          removing the stronger of the set of groups offered).  This
-          could cause the server to negotiate a weaker group than
-          desired, but again should be caught by the check in the
-          Finished message.
-          </t>
-        </list>
+        <t>
+          An attacker who impersonates the server can try to do the
+          following:
+          <list>
+            <t>
+              Pretend that a non-compatible server is actually capable
+              of this extension, and select a group from the client's
+              list, causing the client to select a group it is willing
+              to negotiate.  It is unclear how this would be an
+              effective attack.
+            </t>
+            <t>
+              pretend that a compatible server is actually
+              non-compatible by negotiating a non-DHE ciphersuite. This
+              is no different than MITM ciphersuite filtering.
+            </t>
+            <t>
+              pretend that a compatible server is actually
+              non-compatible by negotiating a DHE ciphersuite and no
+              extension, with an explicit (perhaps weak) group chosen by
+              the server.  [XXX what are the worst consequences in this
+              case? what might the client leak before it notices that
+              the handshake fails? XXX]
+            </t>
+          </list>
+        </t>
+        <t>
+          An attacker who impersonates the client can try to do the
+          following:
+          <list>
+            <t>
+              Pretend that a compatible client is not compliant (e.g. by
+              not offering this extension).  This could cause the server
+              to negotiate a weaker DHE group during the handshake, but
+              it would fail to complete during the final check of the
+              Finished message.
+            </t>
+            <t>
+              Pretend that a non-compatible client is compatible.  It is
+              not clear how this could be an attack.
+            </t>
+            <t>
+              Change the list of groups offered by the client (e.g. by
+              removing the stronger of the set of groups offered).  This
+              could cause the server to negotiate a weaker group than
+              desired, but again should be caught by the check in the
+              Finished message.
+            </t>
+          </list>
         </t>
       </section>
       <section title="DHE only">
-        <t>Note that this extension specifically targets only discrete
-        log-based Diffie-Hellman ephemeral key exchange mechanisms.
-        It does not cover the non-ephemeral DH key exchange
-        mechanisms, nor does it cover elliptic curve-based DHE key
-        exchange, which has its own list of named groups.
+        <t>
+          Note that this extension specifically targets only discrete
+          log-based Diffie-Hellman ephemeral key exchange mechanisms.
+          It does not cover the non-ephemeral DH key exchange
+          mechanisms, nor does it cover elliptic curve-based DHE key
+          exchange, which has its own list of named groups.
         </t>
       </section>
       <section title="Client fingerprinting">
-        <t>This extension provides a few additional bits of
-        information to distinguish between classes of TLS clients (see
-        e.g.  panopticlick).  To minimize this sort of fingerprinting,
-        clients SHOULD support all named groups at or above their
-        minimum security threshhold.  New named groups SHOULD NOT be
-        added to the registry without consideration of the cost of
-        browser fingerprinting.
+        <t>
+          This extension provides a few additional bits of information
+          to distinguish between classes of TLS clients (see e.g.
+          panopticlick).  To minimize this sort of fingerprinting,
+          clients SHOULD support all named groups at or above their
+          minimum security threshhold.  New named groups SHOULD NOT be
+          added to the registry without consideration of the cost of
+          browser fingerprinting.
         </t>
       </section>
       <section title="Deprecating weak groups">
-        <t>Advances in hardware or in discrete log cryptanalysis may
-        cause some of the negotiated groups to not provide the desired
-        security margins, as indicated by number of years to protect
-        the premaster secret (and therefore the confidentiality and
-        integrity of the TLS session) against a powerful adversary.
-        The IANA registry for these named groups should clearly
-        indicate which groups are considered deprecated.</t>
+        <t>
+          Advances in hardware or in discrete log cryptanalysis may
+          cause some of the negotiated groups to not provide the
+          desired security margins, as indicated by number of years to
+          protect the premaster secret (and therefore the
+          confidentiality and integrity of the TLS session) against a
+          powerful adversary.  The IANA registry for these named
+          groups should clearly indicate which groups are considered
+          deprecated.
+        </t>
+      </section>
+      <section title="Timing attacks">
+        <t>
+          Any use of DHE should use constant-time implementations of
+          the exponentiation.  Even though the chosen secrets 
+        </t>
       </section>
     </section>
   </middle>
@@ -475,65 +532,32 @@ cryptographic levels?)
     <references title="Normative References">
       <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
       &RFC2119;
-
-      <reference anchor="min_ref">
-        <!-- the following is the minimum to make xml2rfc happy -->
-
-        <front>
-          <title>Minimal Reference</title>
-
-          <author initials="authInitials" surname="authSurName">
-            <organization></organization>
-          </author>
-
-          <date year="2006" />
-        </front>
-      </reference>
     </references>
 
     <references title="Informative References">
-      <!-- Here we use entities that we defined at the beginning. -->
 
-      <?rfc include="reference.RFC.2629" ?>
+      &RFC3526;
 
-      &RFC3552;
+      &RFC4419;
 
-      &I-D.narten-iana-considerations-rfc2434bis;
+      &RFC5246;
 
-      <!-- A reference written by by an organization not a person. -->
-
-      <reference anchor="DOMINATION"
-                 target="http://www.example.com/dominator.html">
+      <reference anchor="ENISA"
+                 target="http://www.enisa.europa.eu/activities/identity-and-trust/library/deliverables/algorithms-key-sizes-and-parameters-report">
         <front>
-          <title>Ultimate Plan for Taking Over the World</title>
+          <title>Algorithms, Key Sizes and Parameters Report, version 1.0</title>
 
           <author>
-            <organization>Mad Dominators, Inc.</organization>
+            <organization>European Union Agency for Network and Information Security Agency</organization>
           </author>
 
-          <date year="1984" />
+          <date month="October" year="2013" />
         </front>
       </reference>
-      <reference anchor="SHARING"
-                 target="http://www.example.com/sharing.html">
-        <front>
-          <title>
-		I Learned to Share in Kindergarten
-	  </title>
+   </references>
 
-          <author>
-            <organization>
-		Sesame Street
-	    </organization>
-          </author>
-
-          <date year="1972" />
-        </front>
-      </reference>
-    </references>
-
-    <section anchor="app-additional" title="Additional Stuff">
-      <t>This becomes an Appendix.</t>
+    <section anchor="named_group_registry" title="Named Group Registry">
+      <t>XXX The initial named groups go here. XXX</t>
     </section>
   </back>
 </rfc>
