@@ -20,7 +20,7 @@ view-nroff: $(TITLE).nroff
 
 # this probably only works for dkg:
 publish-html: $(TITLE).html
-	scp $(TITLE).html lair:public_html/$(TITLE)/index.html
+	scp $(TITLE).html $(HOST):public_html/$(TITLE)/index.html
 
 clean:
 	rm -f $(OUTPUTS)

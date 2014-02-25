@@ -37,7 +37,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-xml2rfc-template-05" ipr="trust200902">
+<rfc category="info" docName="draft-gillmor-tls-negotiated-dl-dhe-00" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
@@ -201,7 +201,7 @@
       explicit IANA registry of these groups, and the ids referred to
       in <xref target="RFC3526"/> appear to be intermixed with
       elliptic curve DH groups according to
-      https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2CipherSuites#Diffie-Hellman-Groups
+      <xref target="STRONGSWAN-IKE"/>
       so a new registry seems to be needed, and will be created by
       this document (see <xref target="named_group_registry"
       />XXX)</t>
@@ -554,6 +554,24 @@ cryptographic levels?)
           <date month="October" year="2013" />
         </front>
       </reference>
+
+      <reference anchor="STRONGSWAN-IKE"
+                 target="https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2CipherSuites#Diffie-Hellman-Groups">
+        <front>
+          <title>Diffie Hellman Groups in IKEv2 Cipher Suites</title>
+
+          <author initials="T." surname="Brunner" fullname="Tobias Brunner">
+            <organization>Strongswan</organization>
+          </author>
+
+          <author initials="A." surname="Steffen" fullname="Andreas Steffen">
+            <organization>Strongswan</organization>
+          </author>
+
+          <date month="October" year="2013" />
+        </front>
+      </reference>
+
    </references>
 
     <section anchor="named_group_registry" title="Named Group Registry">
