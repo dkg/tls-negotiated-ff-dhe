@@ -707,6 +707,18 @@ cryptographic levels?)
    </references>
 
     <section anchor="named_group_registry" title="Named Group Registry">
+      <t>
+        The primes in these discrete log groups are all safe primes,
+        that is, a prime p is a safe prime when q = (p-1)/2 is also
+        prime.  They are generated for a given bitlength b by finding
+        the lowest positive integer X that creates a safe prime p
+        where:
+      </t>
+      <figure>
+        <artwork><![CDATA[
+ p = 2^b - 2^{b-64} + X * 2^64 - 1
+]]></artwork>
+      </figure>
       <section anchor="dldhe2432" title="dldhe2432">
         <t>The 2432-bit group has registry value 0, and is calcluated
         from the following formula:</t>
