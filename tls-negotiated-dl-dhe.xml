@@ -55,14 +55,14 @@
 
     <!-- Another author who claims to be an editor -->
 
-    <author fullname="Daniel Kahn Gillmor" initials="D.K.G." surname="Gillmor">
-      <organization>Independent</organization>
+    <author fullname="Daniel Kahn Gillmor" initials="D." surname="Gillmor">
+      <organization>ACLU</organization>
       <address>
         <postal>
-          <street></street>
-          <city>Brooklyn</city>
+          <street>125 Broad Street, 18th Floor</street>
+          <city>New York</city>
           <region>NY</region>
-          <code></code>
+          <code>10004</code>
           <country>USA</country>
         </postal>
         <phone></phone>
@@ -71,7 +71,7 @@
       </address>
     </author>
 
-    <date month="February" year="2014" />
+    <date month="March" year="2014" />
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
          in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -91,7 +91,7 @@
 	 If this element is not present, the default is "Network Working Group",
          which is used by the RFC Editor as a nod to the history of the IETF. -->
 
-    <keyword>Diffie-Hellman, TLS, Negotiation, Extensions</keyword>
+    <keyword>Diffie-Hellman, Discrete Logarithm, Transport Layer Security, TLS, Negotiation, Extensions</keyword>
 
     <!-- Keywords will be incorporated into HTML output
          files in a meta tag but they have no effect on text or nroff
@@ -167,9 +167,8 @@
 
       <t>The client SHOULD send an extension of type
       "negotiated_dl_dhe_groups" in the ClientHello, indicating an
-      list of known and acceptable traditional discrete log
-      Diffie-Hellman groups, ordered from most preferred to least
-      preferred.</t>
+      list of known discrete log Diffie-Hellman groups, ordered from
+      most preferred to least preferred.</t>
 
       <t>The "extension_data" field of this extension SHALL contain
       "DiscreteLogDHEGroups" where:</t>
@@ -177,8 +176,8 @@
       <figure>
         <artwork><![CDATA[
       enum {
-          dldhe2048(0), dldhe3072(1), dldhe4096(2), dldhe6144(3),
-          dldhe8192(4),  (255)
+          dldhe2432(0), dldhe3072(1), dldhe4096(2),
+          dldhe6144(3), dldhe8192(4), (255)
       } DiscreteLogDHEGroup;
 
       struct {
@@ -191,20 +190,10 @@
       one DHE-key-exchange ciphersuite in the Client Hello.</t>
 
       <t>The known groups defined by the DiscreteLogDHEGroup registry
-      refer to the primes referenced by the Discrete Log "Oakley"
-      groups listed by size in <xref target="RFC3526"/>.  These are
-      all safe primes, generated from the hexadecimal expansion of pi,
-      bracketed with 64 "1" bits on either side. While <xref target="RFC3526"/> uses a
-      generator of 2 for each group (often creating a group of order
-      (p-1)/2), these named groups choose the lowest generator that
-      creates a group of order p-1.  (XXX There does not seem to be an
-      explicit IANA registry of these groups, and the ids referred to
-      in <xref target="RFC3526"/> appear to be intermixed with
-      elliptic curve DH groups according to
-      <xref target="STRONGSWAN-IKE"/>
-      so a new registry seems to be needed, and will be created by
-      this document (see <xref target="named_group_registry"
-      />XXX)</t>
+      are listed in <xref target="named_group_registry"/>.  These are
+      all safe primes, designed to be sparse, and with the high and
+      low 64 bits set to 1 for efficient Montgomery or Barrett reduction.
+      </t>
 
       <t>A client who offers a group MUST be able and willing to
       perform a DH key exchange using that group.</t>
@@ -247,7 +236,7 @@
 
       <t>This re-purposing of dh_p and dh_g is unambiguous: there are
       no groups with a generator of 0, and no implementation should
-      accept a modulus of size &lt; 8 bits.  This change serves two
+      accept a modulus of size &lt; 9 bits.  This change serves two
       purposes:
 
       <list>
@@ -260,10 +249,11 @@
       </t>
     </section>
     <section anchor="optimizations" title="Optimizations">
-      <t>In a successful negotiated discrete log DH group, both peers
-      know that the group in question uses a safe prime as a modulus,
-      and that the group in use is of size p-1.  This allows at least
-      two optimizations that can be used to improve performance.
+      <t>In a successfully negotiated discrete log DH group key
+      exchange, both peers know that the group in question uses a safe
+      prime as a modulus, and that the group in use is of size p-1 or
+      (p-1)/2.  This allows at least two optimizations that can be
+      used to improve performance.
       </t>
       <section anchor="peercheck" title="Checking the Peer's Public Key">
         <t>Peers should validate the each other's public key Y
@@ -277,7 +267,7 @@
         learn its factors, and test Y against each of its factors.
         </t>
       </section>
-      <section anchor="shortexponent" title="Short Exponents">
+      <section anchor="short-exponents" title="Short Exponents">
         <t>
           Traditional Discrete Log Diffie-Hellman has each peer choose
           their secret exponent from the range [2,p-2].  Using
@@ -285,7 +275,6 @@
           roughly 2*log_2(p) multiplications, twice (once for the
           generator and once for the peer's public key).
         </t>
-
         <t>
           Peers concerned with performance may also prefer to choose
           their secret exponent from a smaller range, doing fewer
@@ -310,9 +299,9 @@
           Peers wishing to further accelerate DHE key exchange can
           also pre-compute a table of powers of the generator of a
           known group.  This is a memory vs. time tradeoff, and it
-          only accelerates the first exponentiation of the DH exchange
-          (the exponentiation using the peer's public exponent as a
-          base still needs to be done as normal).
+          only accelerates the first exponentiation of the ephemeral
+          DH exchange (the exponentiation using the peer's public
+          exponent as a base still needs to be done as normal).
         </t>
       </section>
     </section>
@@ -349,33 +338,44 @@
         <t>Is there any reason to include a weak group in the list of
         groups?  Most DHE-capable peers can already handle 1024-bit
         DHE, and therefore 1024-bit DHE does not need to be
-        negotiated.  Properly-chosen 2048-bit DH groups should be
+        negotiated.  Properly-chosen 2432-bit DH groups should be
         roughly equivalent to 112-bit security.  And future
         implementations should use sizes of at least 3072 bits
         according to <xref target="ENISA"/>.
         </t>
       </section>
       <section title="Arbitrary Groups">
-        <t>This spec currently doesn't indicate any support for groups
-        other than the named groups.  Other DHE specifications have
-        moved away from staticly-named groups with the
-        explicitly-stated rationale of reducing the incentive for
-        precomputation-driven attacks on any specific group
-        (e.g. section 1 of <xref target="RFC4419"/>).  If we instead
-        allow the server to propose arbitrary groups, we could make it
-        a MUST that the generated groups use safe prime moduli, while
-        still allowing clients to signal support (and desire) for
-        large groups.  This leaves the client in the position of
-        relying on the server to choose a strong modulus, though.
+        <t>
+          This spec currently doesn't indicate any support for groups
+          other than the named groups.  Other DHE specifications have
+          moved away from staticly-named groups with the
+          explicitly-stated rationale of reducing the incentive for
+          precomputation-driven attacks on any specific group
+          (e.g. section 1 of <xref target="RFC4419"/>).  However,
+          arbitrary large groups are expensive to transmit over the
+          network and it is computationally infeasible for the client
+          to verify their structure during a key exchange.  If we
+          instead allow the server to propose arbitrary groups, we
+          could make it a MUST that the generated groups use safe
+          prime moduli, while still allowing clients to signal support
+          (and desire) for large groups.  This leaves the client in
+          the position of relying on the server to choose a strong
+          modulus, though.
+        </t>
+        <t>
+          Note that in at least one known attack against TLS <xref
+          target="SECURE-RESUMPTION"/>, a malicious server uses a
+          deliberately broken discrete log DHE group to impersonate
+          the client to a different server.
         </t>
       </section>
     </section>
 
 <!--
 
-guidance to servers for what to choose (choose based on trying to
-"balance" with other selected mechanisms, like server host pubkey and
-cipher and MAC?)
+guidance to servers for which named group to choose (choose based on
+trying to "balance" with other selected mechanisms, like server host
+pubkey and cipher and MAC?)
 
 guidance to clients for what to offer (offer based on acceptable
 cryptographic levels?)
@@ -385,8 +385,9 @@ cryptographic levels?)
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>
         Thanks to Tom Ritter and Nikos Mavrogiannopolous and Niels
-        M&#246;ller for their comments and suggestions on the idea for
-        this draft.
+        M&#246;ller and Kenny Paterson for their comments and
+        suggestions on the idea for this draft.  Any mistakes here are
+        not theirs.
       </t>
     </section>
 
@@ -413,7 +414,7 @@ cryptographic levels?)
    </section>
 
     <section anchor="Security" title="Security Considerations">
-      <section title="Resistance to active attacks">
+      <section title="Negotiation resistance to active attacks">
         <t>
           Because the contents of this extension is hashed in the
           finished message, an active MITM that tries to filter or
@@ -433,17 +434,17 @@ cryptographic levels?)
               effective attack.
             </t>
             <t>
-              pretend that a compatible server is actually
+              Pretend that a compatible server is actually
               non-compatible by negotiating a non-DHE ciphersuite. This
               is no different than MITM ciphersuite filtering.
             </t>
             <t>
-              pretend that a compatible server is actually
+              Pretend that a compatible server is actually
               non-compatible by negotiating a DHE ciphersuite and no
-              extension, with an explicit (perhaps weak) group chosen by
-              the server.  [XXX what are the worst consequences in this
-              case? what might the client leak before it notices that
-              the handshake fails? XXX]
+              extension, with an explicit (perhaps weak) group chosen
+              by the server.  [XXX what are the worst consequences in
+              this case?  What might the client leak before it notices
+              that the handshake fails? XXX]
             </t>
           </list>
         </t>
@@ -485,11 +486,11 @@ cryptographic levels?)
         <t>
           This extension provides a few additional bits of information
           to distinguish between classes of TLS clients (see e.g.
-          panopticlick).  To minimize this sort of fingerprinting,
-          clients SHOULD support all named groups at or above their
-          minimum security threshhold.  New named groups SHOULD NOT be
-          added to the registry without consideration of the cost of
-          browser fingerprinting.
+          <xref target="PANOPTICLICK"/>).  To minimize this sort of
+          fingerprinting, clients SHOULD support all named groups at
+          or above their minimum security threshhold.  New named
+          groups SHOULD NOT be added to the registry without
+          consideration of the cost of browser fingerprinting.
         </t>
       </section>
       <section title="Deprecating weak groups">
@@ -499,15 +500,83 @@ cryptographic levels?)
           desired security margins, as indicated by number of years to
           protect the premaster secret (and therefore the
           confidentiality and integrity of the TLS session) against a
-          powerful adversary.  The IANA registry for these named
-          groups should clearly indicate which groups are considered
-          deprecated.
+          powerful adversary.
+        </t>
+        <t>
+          Revisions of this extension or updates should mark
+          known-weak groups as explicitly deprecated, and
+          implementations that require strong confidentiality and
+          integrity guarantees should avoid using any deprecated
+          groups.
+        </t>
+      </section>
+      <section title="Choice of groups">
+        <t>
+          <xref target="STRONGSWAN-IKE">Other lists of named discrete
+          log Diffie-Hellman groups</xref> exist.  This draft chooses
+          to not reuse them for several reasons:
+          <list>
+            <t>
+              Using the same groups in multiple protocols increases
+              the value for an attacker with the resources to crack
+              any single group.
+            </t>
+            <t>
+              The IKE groups include weak groups like MODP768 which
+              are unacceptable for secure TLS traffic.
+            </t>
+            <t>
+              The IKE groups do not have sparse moduli, which makes
+              modular exponentiation less efficient.
+            </t>
+            <t>
+              Mixing group parameters across multiple implementations
+              leaves open the possibility of some sort of
+              cross-protocol attack.  This shouldn't be relevant for
+              ephemeral scenarios, and even with non-ephemeral keying,
+              services shouldn't reuse keys; however, using different
+              groups avoids these failure modes entirely.
+            </t>
+            <t>
+              The DL DHE groups are not collected in a single IANA
+              registry, or are mixed with non-DL DHE groups, which makes
+              them inconvenient for re-use in TLS.
+            </t>
+          </list>
         </t>
       </section>
       <section title="Timing attacks">
         <t>
-          Any use of DHE should use constant-time implementations of
-          the exponentiation.  Even though the chosen secrets 
+          Any implementation of discrete log Diffie-Hellman key
+          exchange should use constant-time modular-exponentiation
+          implementations.  This is particularly true for those
+          implementations that ever re-use DHE parameters (so-called
+          "semi-static" ephemeral keying).
+        </t>
+      </section>
+      <section title="Replay attacks from non-negotiated DL DHE">
+        <t>
+          <xref target="SECURE-RESUMPTION" /> shows a malicious
+          peer using a bad DL DHE group to maneuver a client into
+          selecting a pre-master secret of the peer's choice, which
+          can be replayed to another server using a non-DHE key
+          exchange, and can then be bootstrapped to replay client
+          authentication.
+        </t>
+        <t>
+          To prevent this attack (barring the fixes proposed in <xref
+          target="SESSION-HASH"/>), a client would need not only to implement this
+          draft, but also to reject non-negotiated DL DHE ciphersuites
+          whose group structure it cannot afford to verify.  Such a
+          client would need to abort the initial handshake and
+          reconnect to the server in question without listing any DL
+          DHE ciphersuites on the subsequent connection.
+        </t>
+        <t>
+          This tradeoff may be too costly for most TLS clients today,
+          but may be a reasonable choice for clients performing client
+          certificate authentication, or who have other reason to be
+          concerned about server-controlled pre-master secrets.
         </t>
       </section>
     </section>
@@ -542,6 +611,8 @@ cryptographic levels?)
 
       &RFC5246;
 
+
+
       <reference anchor="ENISA"
                  target="http://www.enisa.europa.eu/activities/identity-and-trust/library/deliverables/algorithms-key-sizes-and-parameters-report">
         <front>
@@ -572,10 +643,203 @@ cryptographic levels?)
         </front>
       </reference>
 
+      <reference anchor="SECURE-RESUMPTION"
+                 target="https://secure-resumption.com/">
+        <front>
+          <title>Triple Handshakes Considered Harmful: Breaking and Fixing Authentication over TLS</title>
+
+          <author initials="A." surname="Delignat-Lavaud" fullname="Antoine Delignat-Lavaud">
+            <organization>INRIA</organization>
+          </author>
+
+          <author initials="K." surname="Bhargavan" fullname="Karthikeyan Bhargavan">
+            <organization>INRIA</organization>
+          </author>
+
+          <author initials="A." surname="Pironti" fullname="Alfredo Pironti">
+            <organization>INRIA</organization>
+          </author>
+
+          <date month="March" year="2014" />
+        </front>
+      </reference>
+
+      <reference anchor="SESSION-HASH"
+                 target="https://secure-resumption.com/draft-bhargavan-tls-session-hash-00.txt">
+        <front>
+          <title>Triple Handshakes Considered Harmful: Breaking and Fixing Authentication over TLS</title>
+
+          <author initials="K." surname="Bhargavan" fullname="Karthikeyan Bhargavan">
+            <organization>INRIA</organization>
+          </author>
+
+          <author initials="A." surname="Delignat-Lavaud" fullname="Antoine Delignat-Lavaud">
+            <organization>INRIA</organization>
+          </author>
+
+          <author initials="A." surname="Pironti" fullname="Alfredo Pironti">
+            <organization>INRIA</organization>
+          </author>
+
+          <author initials="A." surname="Langley" fullname="Adam Langley">
+            <organization>Google</organization>
+          </author>
+
+          <author initials="M." surname="Ray" fullname="Marsh Ray">
+            <organization>Microsoft</organization>
+          </author>
+
+          <date month="March" year="2014" />
+        </front>
+      </reference>
+
+      <reference anchor="PANOPTICLICK"
+                 target="https://panopticlick.eff.org/">
+        <front>
+          <title>Panopticlick: How Unique - and Trackable - Is Your Browser?</title>
+          <author>
+            <organization>Electronic Frontier Foundation</organization>
+          </author>
+          <date year="2010" />
+        </front>
+      </reference>
+
    </references>
 
     <section anchor="named_group_registry" title="Named Group Registry">
-      <t>XXX The initial named groups go here. XXX</t>
+      <section anchor="dldhe2432" title="dldhe2432">
+        <t>The 2432-bit group has registry value 0, and is calcluated
+        from the following formula:</t>
+        <t>The modulus is: p = 2^2432 - 2^2368 + 2332920 * 2^64 - 1</t>
+        <t>Its hexadecimal representation is:</t>
+        <figure>
+        <artwork><![CDATA[
+ FFFFFFFF FFFFFFFF 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 002398F7 FFFFFFFF FFFFFFFF
+ ]]></artwork>
+      </figure>
+        <t>The generator is: g = 2</t>
+        <t>The group size is (p-1)/2</t>
+        <t>Peers using dldhe2432 that want to optimize their key
+        exchange with a <xref target="short-exponents">short
+        exponent</xref> should choose a secret key of at least 224
+        bits.</t>
+      </section>
+      <section anchor="dldhe3072" title="dldhe3072">
+        <t>The 3072-bit prime has registry value 1, and is calcluated
+        from the following formula:</t>
+        <t>p = 2^3072 - 2^3008 + 425754 * 2^64 -1</t>
+        <t>Its hexadecimal representation is:</t>
+        <figure>
+        <artwork><![CDATA[
+ FFFFFFFF FFFFFFFF 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00067F19 FFFFFFFF FFFFFFFF
+ ]]></artwork>
+      </figure>
+        <t>The generator is: g = 2</t>
+        <t>The group size is: (p-1)/2</t>
+        <t>Peers using dldhe3072 that want to optimize their key
+        exchange with a <xref target="short-exponents">short
+        exponent</xref> should choose a secret key of at least 256
+        bits.</t>
+      </section>
+
+      <section anchor="dldhe4096" title="dldhe4096">
+        <t>The 4096-bit group has registry value 2, and is calcluated
+        from the following formula:</t>
+        <t>The modulus is: p = 2^4096 - 2^4032 + 341664 * 2^64 - 1</t>
+        <t>Its hexadecimal representation is:</t>
+        <figure>
+        <artwork><![CDATA[
+ FFFFFFFF FFFFFFFF 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 00000000
+ 00000000 00000000 00000000 00000000 00000000 0005369F
+ FFFFFFFF FFFFFFFF
+ ]]></artwork>
+      </figure>
+        <t>The base is: g = 2</t>
+        <t>The group size is: (p-1)/2</t>
+        <t>Peers using dldhe4096 that want to optimize their key
+        exchange with a <xref target="short-exponents">short
+        exponent</xref> should choose a secret key of at least XXX
+        bits.</t>
+      </section>
+      <section anchor="dldhe6144" title="dldhe6144">
+        <t>The 6144-bit group has registry value 3, and is calcluated
+        from the following formula:</t>
+        <t>The modulus is: p = 2^6144 - 2^6080 + XXX * 2^64 - 1</t>
+        <t>Its hexadecimal representation is:</t>
+        <figure>
+        <artwork><![CDATA[
+ XXX ...still calculating... XXX
+ ]]></artwork>
+      </figure>
+        <t>The generator is: 2</t>
+        <t>Peers using dldhe6144 that want to optimize their key
+        exchange with a <xref target="short-exponents">short
+        exponent</xref> should choose a secret key of at least XXX
+        bits.</t>
+      </section>
+      <section anchor="dldhe8192" title="dldhe8192">
+        <t>The 8192-bit group has registry value 4, and is calcluated
+        from the following formula:</t>
+        <t>The modulus is: p = 2^8192 - 2^8128 + XXX * 2^64 - 1</t>
+        <t>Its hexadecimal representation is:</t>
+        <figure>
+        <artwork><![CDATA[
+ XXX ...still calculating... XXX
+ ]]></artwork>
+      </figure>
+        <t>The base is: g = 2</t>
+        <t>Peers using dldhe8192 that want to optimize their key
+        exchange with a <xref target="short-exponents">short
+        exponent</xref> should choose a secret key of at least XXX
+        bits.</t>
+      </section>
+
     </section>
   </back>
 </rfc>
