@@ -9,6 +9,7 @@
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC3526 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3526.xml">
 <!ENTITY RFC4419 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4419.xml">
+<!ENTITY RFC5226 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5226.xml">
 <!ENTITY RFC5246 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5246.xml">
 ]>
 
@@ -71,7 +72,7 @@
       </address>
     </author>
 
-    <date month="March" year="2014" />
+    <date month="April" year="2014" />
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
          in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -157,6 +158,18 @@
         document are to be interpreted as described in <xref
         target="RFC2119"/>.</t>
       </section>
+
+      <section title="Vocabulary">
+        <t>
+          The term "DHE" is used in this document to refer to the
+          discrete-logarithm-based Diffie-Hellman ephemeral key
+          exchange mechanism in TLS.  TLS also supports
+          elliptic-curve-based Diffie Hellman ephemeral key exchanges,
+          but this document does not discuss their use.  Mentions of
+          DHE here refer strictly to discrete-log-based DHE, and not
+          to ECDHE.
+        </t>
+      </section>
     </section>
 
     <section anchor="client" title="Client Behavior">
@@ -166,7 +179,7 @@
       mechanism.</t>
 
       <t>The client SHOULD send an extension of type
-      "negotiated_dl_dhe_groups" in the ClientHello, indicating an
+      "negotiated_dl_dhe_groups" in the ClientHello, indicating a
       list of known discrete log Diffie-Hellman groups, ordered from
       most preferred to least preferred.</t>
 
@@ -191,8 +204,9 @@
 
       <t>The known groups defined by the DiscreteLogDHEGroup registry
       are listed in <xref target="named_group_registry"/>.  These are
-      all safe primes, designed to be sparse, and with the high and
-      low 64 bits set to 1 for efficient Montgomery or Barrett reduction.
+      all safe primes derived from the base of the natural logarithm,
+      with the high and low 64 bits set to 1 for efficient Montgomery
+      or Barrett reduction.
       </t>
 
       <t>A client who offers a group MUST be able and willing to
@@ -226,33 +240,39 @@
       offered by the client.
       </t>
 
-      <t>When the server sends the "negotiated_dl_dhe_groups"
-      extension in the ServerHello, the ServerDHParams member of the
-      subsequent ServerKeyExchange message should indicate a one-byte
-      zero value (0) in place of dh_g and the identifier of the named
-      group in place of dh_p, represented as a one-byte value.  dh_Ys
-      must be transmitted as normal.
-      </t>
+      <section anchor="ServerDHParams" title="ServerDHParams changes">
+        <t>
+          When the server sends the "negotiated_dl_dhe_groups"
+          extension in the ServerHello, the ServerDHParams member of
+          the subsequent ServerKeyExchange message should indicate a
+          one-byte zero value (0) in place of dh_g and the identifier
+          of the named group in place of dh_p, represented as a
+          one-byte value.  dh_Ys must be transmitted as normal.
+        </t>
 
-      <t>This re-purposing of dh_p and dh_g is unambiguous: there are
-      no groups with a generator of 0, and no implementation should
-      accept a modulus of size &lt; 9 bits.  This change serves two
-      purposes:
-
-      <list>
-        <t>The size of the handshake is is reduced (significantly, in
-        the case of a large prime modulus).</t>
-        <t>The signed struct should not be re-playable in a subsequent
-        key exchange that does not indicate named DH groups.</t>
-      </list>
-
-      </t>
+        <t>
+          This re-purposing of dh_p and dh_g is unambiguous: there are
+          no groups with a generator of 0, and no implementation
+          should accept a modulus of size &lt; 9 bits.  This change
+          serves two purposes:
+          <list>
+            <t>
+              The size of the handshake is is reduced (significantly, in
+              the case of a large prime modulus).
+            </t>
+            <t>
+              The signed struct should not be re-playable in a subsequent
+            key exchange that does not indicate named DH groups.
+            </t>
+          </list>
+        </t>
+      </section>
     </section>
     <section anchor="optimizations" title="Optimizations">
       <t>In a successfully negotiated discrete log DH group key
       exchange, both peers know that the group in question uses a safe
       prime as a modulus, and that the group in use is of size p-1 or
-      (p-1)/2.  This allows at least two optimizations that can be
+      (p-1)/2.  This allows at least three optimizations that can be
       used to improve performance.
       </t>
       <section anchor="peercheck" title="Checking the Peer's Public Key">
@@ -264,7 +284,7 @@
 
         <t>To reach the same assurance with an unknown group, the
         client would need to verify the primality of the modulus,
-        learn its factors, and test Y against each of its factors.
+        learn the factors of p-1, and test Y against each factor.
         </t>
       </section>
       <section anchor="short-exponents" title="Short Exponents">
@@ -282,14 +302,14 @@
           security.  Each named group indicates its approximate
           security level, and provides a lower-bound on the range of
           secret exponents that should preserve it.  For example,
-          rather than doing 2*2*2048 multiplications for a dldhe2048
+          rather than doing 2*2*2432 multiplications for a dldhe2432
           handshake, each peer can choose to do 2*2*224
           multiplications by choosing their secret exponent in the
           range [2,2^224] and still keep the approximate 112-bit
           security level.
         </t>
         <t>
-          A similar short-exponent approach is used in SSH's
+          A similar short-exponent approach is suggested in SSH's
           Diffie-Hellman key exchange (See section 6.2 of <xref
           target="RFC4419"/>).
         </t>
@@ -384,10 +404,10 @@ cryptographic levels?)
 
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>
-        Thanks to Tom Ritter and Nikos Mavrogiannopolous and Niels
-        M&#246;ller and Kenny Paterson for their comments and
-        suggestions on the idea for this draft.  Any mistakes here are
-        not theirs.
+        Thanks to Tom Ritter, Nikos Mavrogiannopolous, Niels
+        M&#246;ller, Kenny Paterson, Sandy Harris, and Watson Ladd for
+        their comments and suggestions on this draft.  Any mistakes
+        here are not theirs.
       </t>
     </section>
 
@@ -404,12 +424,16 @@ cryptographic levels?)
       </t>
 
       <t>
-        This extension also defines a registry of TLS named Discrete
-        Log DH groups, derived initially from some of the <xref
-        target="RFC3526">IKE DH groups</xref>, indicating the advised
-        strength of each group and whether it is recommended for use
-        in TLS.  These recommendations may be updated by future
-        revisions.
+        <xref target="named_group_registry" /> defines a TLS Discrete
+        Log DHE Named Group Registry.  Each entry in this registry
+        indicates the group itself, its derivation, its expected
+        strength, and whether it is recommended for use in TLS key
+        exchange at the given security level.  This registry may be
+        updated by the addition of new discrete log groups, and by
+        reassessments of the security level or utility to TLS of any
+        already present group.  Updates are made by <xref
+        target="RFC5226">IETF Review</xref>, and should consider <xref
+        target="Client-Fingerprinting"/>.
       </t>
    </section>
 
@@ -423,8 +447,8 @@ cryptographic levels?)
           otherwise have done.
         </t>
         <t>
-          An attacker who impersonates the server can try to do the
-          following:
+          An attacker who impersonates the server can try to do any of
+          the following:
           <list>
             <t>
               Pretend that a non-compatible server is actually capable
@@ -460,7 +484,10 @@ cryptographic levels?)
               Finished message.
             </t>
             <t>
-              Pretend that a non-compatible client is compatible.  It is
+              Pretend that a non-compatible client is compatible.
+              This could cause the server to send what appears to be
+              an extremely odd ServerDHParams (see <xref target="ServerDHParams"/>),
+              and the check in the Finished message would fail. It is
               not clear how this could be an attack.
             </t>
             <t>
@@ -482,32 +509,24 @@ cryptographic levels?)
           exchange, which has its own list of named groups.
         </t>
       </section>
-      <section title="Client fingerprinting">
-        <t>
-          This extension provides a few additional bits of information
-          to distinguish between classes of TLS clients (see e.g.
-          <xref target="PANOPTICLICK"/>).  To minimize this sort of
-          fingerprinting, clients SHOULD support all named groups at
-          or above their minimum security threshhold.  New named
-          groups SHOULD NOT be added to the registry without
-          consideration of the cost of browser fingerprinting.
-        </t>
-      </section>
       <section title="Deprecating weak groups">
         <t>
           Advances in hardware or in discrete log cryptanalysis may
           cause some of the negotiated groups to not provide the
-          desired security margins, as indicated by number of years to
-          protect the premaster secret (and therefore the
-          confidentiality and integrity of the TLS session) against a
-          powerful adversary.
+          desired security margins, as indicated by the estimated work
+          factor of an adversary to discover the premaster secret (and
+          therefore compromise the confidentiality and integrity of
+          the TLS session).
         </t>
         <t>
           Revisions of this extension or updates should mark
-          known-weak groups as explicitly deprecated, and
-          implementations that require strong confidentiality and
-          integrity guarantees should avoid using any deprecated
-          groups.
+          known-weak groups as explicitly deprecated for use in TLS,
+          and should update the estimated work factor needed to break
+          the group, if the cryptanalysis has changed.
+          Implementations that require strong confidentiality and
+          integrity guarantees should avoid using deprecated groups
+          and should be updated when the estimated security margins
+          are updated.
         </t>
       </section>
       <section title="Choice of groups">
@@ -526,21 +545,18 @@ cryptographic levels?)
               are unacceptable for secure TLS traffic.
             </t>
             <t>
-              The IKE groups do not have sparse moduli, which makes
-              modular exponentiation less efficient.
-            </t>
-            <t>
               Mixing group parameters across multiple implementations
               leaves open the possibility of some sort of
               cross-protocol attack.  This shouldn't be relevant for
               ephemeral scenarios, and even with non-ephemeral keying,
-              services shouldn't reuse keys; however, using different
+              services shouldn't share keys; however, using different
               groups avoids these failure modes entirely.
             </t>
             <t>
-              The DL DHE groups are not collected in a single IANA
-              registry, or are mixed with non-DL DHE groups, which makes
-              them inconvenient for re-use in TLS.
+              Other lists of named DL DHE groups are not collected in
+              a single IANA registry, or are mixed with non-DL DHE
+              groups, which makes them inconvenient for re-use in a
+              TLS DHE key exchange context.
             </t>
           </list>
         </t>
@@ -550,8 +566,10 @@ cryptographic levels?)
           Any implementation of discrete log Diffie-Hellman key
           exchange should use constant-time modular-exponentiation
           implementations.  This is particularly true for those
-          implementations that ever re-use DHE parameters (so-called
-          "semi-static" ephemeral keying).
+          implementations that ever re-use DHE secret keys (so-called
+          "semi-static" ephemeral keying) or share DHE secret keys
+          across a multiple machines (e.g. in a load-balancer
+          situation).
         </t>
       </section>
       <section title="Replay attacks from non-negotiated DL DHE">
@@ -577,6 +595,20 @@ cryptographic levels?)
           but may be a reasonable choice for clients performing client
           certificate authentication, or who have other reason to be
           concerned about server-controlled pre-master secrets.
+        </t>
+      </section>
+    </section>
+
+    <section anchor="Privacy" title="Privacy Considerations">
+      <section anchor="Client-Fingerprinting" title="Client fingerprinting">
+        <t>
+          This extension provides a few additional bits of information
+          to distinguish between classes of TLS clients (see e.g.
+          <xref target="PANOPTICLICK"/>).  To minimize this sort of
+          fingerprinting, clients SHOULD support all named groups at
+          or above their minimum security threshhold.  New named
+          groups SHOULD NOT be added to the registry without
+          consideration of the cost of browser fingerprinting.
         </t>
       </section>
     </section>
@@ -608,6 +640,8 @@ cryptographic levels?)
       &RFC3526;
 
       &RFC4419;
+
+      &RFC5226;
 
       &RFC5246;
 
@@ -710,35 +744,43 @@ cryptographic levels?)
       <t>
         The primes in these discrete log groups are all safe primes,
         that is, a prime p is a safe prime when q = (p-1)/2 is also
-        prime.  They are generated for a given bitlength b by finding
-        the lowest positive integer X that creates a safe prime p
-        where:
+        prime.  Where e is the base of the natural logarithm, and
+        square brackets denote the floor operation, the groups which
+        initially populate this registry are derived for a given
+        bitlength b by finding the lowest positive integer X that
+        creates a safe prime p where:
       </t>
       <figure>
         <artwork><![CDATA[
- p = 2^b - 2^{b-64} + X * 2^64 - 1
+ p = 2^b - 2^{b-64} + {[2^{b-130} e] + X } * 2^64 - 1
 ]]></artwork>
       </figure>
+      <t>
+        New additions to this registry may use this same derivation
+        (e.g. with different bitlengths) or may choose their
+        parameters in a different way, but must be clear about how the
+        parameters were derived.
+      </t>
       <section anchor="dldhe2432" title="dldhe2432">
         <t>The 2432-bit group has registry value 0, and is calcluated
         from the following formula:</t>
-        <t>The modulus is: p = 2^2432 - 2^2368 + 2332920 * 2^64 - 1</t>
+        <t>The modulus is: p = 2^2432 - 2^2368 + {[2^2302 * e] + 2111044} * 2^64 - 1</t>
         <t>Its hexadecimal representation is:</t>
         <figure>
         <artwork><![CDATA[
- FFFFFFFF FFFFFFFF 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 002398F7 FFFFFFFF FFFFFFFF
+ FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1
+ D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9
+ 7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561
+ 2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935
+ 984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735
+ 30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB
+ B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19
+ 0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61
+ 9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73
+ 3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA
+ 886B4238 611FCFDC DE355B3B 6519035B BC34F4DE F99C0238
+ 61B46FC9 D6E6C907 7AD91D26 91F7F7EE 598CB0FA C186D91C
+ AEFE1309 8533C8B3 FFFFFFFF FFFFFFFF
  ]]></artwork>
       </figure>
         <t>The generator is: g = 2</t>
@@ -751,26 +793,26 @@ cryptographic levels?)
       <section anchor="dldhe3072" title="dldhe3072">
         <t>The 3072-bit prime has registry value 1, and is calcluated
         from the following formula:</t>
-        <t>p = 2^3072 - 2^3008 + 425754 * 2^64 -1</t>
+        <t>p = 2^3072 - 2^3008 + {[2^2942 * e] + 2625351} * 2^64 -1</t>
         <t>Its hexadecimal representation is:</t>
         <figure>
         <artwork><![CDATA[
- FFFFFFFF FFFFFFFF 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00067F19 FFFFFFFF FFFFFFFF
+ FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1
+ D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9
+ 7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561
+ 2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935
+ 984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735
+ 30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB
+ B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19
+ 0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61
+ 9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73
+ 3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA
+ 886B4238 611FCFDC DE355B3B 6519035B BC34F4DE F99C0238
+ 61B46FC9 D6E6C907 7AD91D26 91F7F7EE 598CB0FA C186D91C
+ AEFE1309 85139270 B4130C93 BC437944 F4FD4452 E2D74DD3
+ 64F2E21E 71F54BFF 5CAE82AB 9C9DF69E E86D2BC5 22363A0D
+ ABC52197 9B0DEADA 1DBF9A42 D5C4484E 0ABCD06B FA53DDEF
+ 3C1B20EE 3FD59D7C 25E41D2B 66C62E37 FFFFFFFF FFFFFFFF
  ]]></artwork>
       </figure>
         <t>The generator is: g = 2</t>
@@ -784,31 +826,31 @@ cryptographic levels?)
       <section anchor="dldhe4096" title="dldhe4096">
         <t>The 4096-bit group has registry value 2, and is calcluated
         from the following formula:</t>
-        <t>The modulus is: p = 2^4096 - 2^4032 + 341664 * 2^64 - 1</t>
+        <t>The modulus is: p = 2^4096 - 2^4032 + {[2^3966 * e] + 5736041} * 2^64 - 1</t>
         <t>Its hexadecimal representation is:</t>
         <figure>
         <artwork><![CDATA[
- FFFFFFFF FFFFFFFF 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 00000000
- 00000000 00000000 00000000 00000000 00000000 0005369F
+ FFFFFFFF FFFFFFFF ADF85458 A2BB4A9A AFDC5620 273D3CF1
+ D8B9C583 CE2D3695 A9E13641 146433FB CC939DCE 249B3EF9
+ 7D2FE363 630C75D8 F681B202 AEC4617A D3DF1ED5 D5FD6561
+ 2433F51F 5F066ED0 85636555 3DED1AF3 B557135E 7F57C935
+ 984F0C70 E0E68B77 E2A689DA F3EFE872 1DF158A1 36ADE735
+ 30ACCA4F 483A797A BC0AB182 B324FB61 D108A94B B2C8E3FB
+ B96ADAB7 60D7F468 1D4F42A3 DE394DF4 AE56EDE7 6372BB19
+ 0B07A7C8 EE0A6D70 9E02FCE1 CDF7E2EC C03404CD 28342F61
+ 9172FE9C E98583FF 8E4F1232 EEF28183 C3FE3B1B 4C6FAD73
+ 3BB5FCBC 2EC22005 C58EF183 7D1683B2 C6F34A26 C1B2EFFA
+ 886B4238 611FCFDC DE355B3B 6519035B BC34F4DE F99C0238
+ 61B46FC9 D6E6C907 7AD91D26 91F7F7EE 598CB0FA C186D91C
+ AEFE1309 85139270 B4130C93 BC437944 F4FD4452 E2D74DD3
+ 64F2E21E 71F54BFF 5CAE82AB 9C9DF69E E86D2BC5 22363A0D
+ ABC52197 9B0DEADA 1DBF9A42 D5C4484E 0ABCD06B FA53DDEF
+ 3C1B20EE 3FD59D7C 25E41D2B 669E1EF1 6E6F52C3 164DF4FB
+ 7930E9E4 E58857B6 AC7D5F42 D69F6D18 7763CF1D 55034004
+ 87F55BA5 7E31CC7A 7135C886 EFB4318A ED6A1E01 2D9E6832
+ A907600A 918130C4 6DC778F9 71AD0038 092999A3 33CB8B7A
+ 1A1DB93D 7140003C 2A4ECEA9 F98D0ACC 0A8291CD CEC97DCF
+ 8EC9B55A 7F88A46B 4DB5A851 F44182E1 C68A007E 5E655F6A
  FFFFFFFF FFFFFFFF
  ]]></artwork>
       </figure>
@@ -822,7 +864,7 @@ cryptographic levels?)
       <section anchor="dldhe6144" title="dldhe6144">
         <t>The 6144-bit group has registry value 3, and is calcluated
         from the following formula:</t>
-        <t>The modulus is: p = 2^6144 - 2^6080 + XXX * 2^64 - 1</t>
+        <t>The modulus is: p = 2^6144 - 2^6080 + {[2^6014 * e] + XXX  * 2^64 - 1</t>
         <t>Its hexadecimal representation is:</t>
         <figure>
         <artwork><![CDATA[
@@ -838,7 +880,7 @@ cryptographic levels?)
       <section anchor="dldhe8192" title="dldhe8192">
         <t>The 8192-bit group has registry value 4, and is calcluated
         from the following formula:</t>
-        <t>The modulus is: p = 2^8192 - 2^8128 + XXX * 2^64 - 1</t>
+        <t>The modulus is: p = 2^8192 - 2^8128 + {[2^8062 * e] + XXX} * 2^64 - 1</t>
         <t>Its hexadecimal representation is:</t>
         <figure>
         <artwork><![CDATA[
