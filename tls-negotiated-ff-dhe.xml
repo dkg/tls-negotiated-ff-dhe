@@ -38,7 +38,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-tls-negotiated-dl-dhe-00" ipr="trust200902">
+<rfc category="info" docName="draft-ietf-tls-negotiated-ff-dhe-00" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
@@ -50,7 +50,7 @@
     <!-- The abbreviated title is used in the page header - it is only necessary if the 
          full title is longer than 39 characters -->
 
-    <title abbrev="Negotiated-DL-DHE-for-TLS">Negotiated Discrete Log Diffie-Hellman Ephemeral Parameters for TLS</title>
+    <title abbrev="Negotiated-FF-DHE-for-TLS">Negotiated Finite Field Diffie-Hellman Ephemeral Parameters for TLS</title>
 
     <!-- add 'role="editor"' below for the editors if appropriate -->
 
@@ -92,7 +92,7 @@
 	 If this element is not present, the default is "Network Working Group",
          which is used by the RFC Editor as a nod to the history of the IETF. -->
 
-    <keyword>Diffie-Hellman, Discrete Logarithm, Transport Layer Security, TLS, Negotiation, Extensions</keyword>
+    <keyword>Diffie-Hellman, Discrete Logarithm, Finite Field, Transport Layer Security, TLS, Negotiation, Extensions</keyword>
 
     <!-- Keywords will be incorporated into HTML output
          files in a meta tag but they have no effect on text or nroff
@@ -100,7 +100,7 @@
          keywords will be used for the search engine. -->
 
     <abstract>
-      <t>Traditional discrete logarithm-based Diffie-Hellman (DH) key
+      <t>Traditional finite-field-based Diffie-Hellman (DH) key
       exchange during the TLS handshake suffers from a number of
       security, interoperability, and efficiency shortcomings.  These
       shortcomings arise from lack of clarity about which DH group
@@ -162,47 +162,47 @@
       <section title="Vocabulary">
         <t>
           The term "DHE" is used in this document to refer to the
-          discrete-logarithm-based Diffie-Hellman ephemeral key
+          finite-field-based Diffie-Hellman ephemeral key
           exchange mechanism in TLS.  TLS also supports
           elliptic-curve-based Diffie Hellman ephemeral key exchanges,
           but this document does not discuss their use.  Mentions of
-          DHE here refer strictly to discrete-log-based DHE, and not
+          DHE here refer strictly to finite-field-based DHE, and not
           to ECDHE.
         </t>
       </section>
     </section>
 
     <section anchor="client" title="Client Behavior">
-      <t>A TLS client that is capable of using strong discrete log
+      <t>A TLS client that is capable of using strong finite field
       Diffie-Hellman groups can advertise its capabilities and its
       preferences for stronger key exchange by using this
       mechanism.</t>
 
       <t>The client SHOULD send an extension of type
-      "negotiated_dl_dhe_groups" in the ClientHello, indicating a
-      list of known discrete log Diffie-Hellman groups, ordered from
+      "negotiated_ff_dhe_groups" in the ClientHello, indicating a
+      list of known finite field Diffie-Hellman groups, ordered from
       most preferred to least preferred.</t>
 
       <t>The "extension_data" field of this extension SHALL contain
-      "DiscreteLogDHEGroups" where:</t>
+      "FiniteFieldDHEGroups" where:</t>
 
       <figure>
         <artwork><![CDATA[
       enum {
-          dldhe2432(0), dldhe3072(1), dldhe4096(2),
-          dldhe6144(3), dldhe8192(4), (255)
-      } DiscreteLogDHEGroup;
+          ffdhe2432(0), ffdhe3072(1), ffdhe4096(2),
+          ffdhe6144(3), ffdhe8192(4), (255)
+      } FiniteFieldDHEGroup;
 
       struct {
-          DiscreteLogDHEGroup discrete_log_dhe_group_list<1..2^8-1>;
-      } DiscreteLogDHEGroups;
+          FiniteFieldDHEGroup finite_field_dhe_group_list<1..2^8-1>;
+      } FiniteFieldDHEGroups;
             ]]></artwork>
       </figure>
 
       <t>A client that offers this extension SHOULD include at least
       one DHE-key-exchange ciphersuite in the Client Hello.</t>
 
-      <t>The known groups defined by the DiscreteLogDHEGroup registry
+      <t>The known groups defined by the FiniteFieldDHEGroup registry
       are listed in <xref target="named_group_registry"/>.  These are
       all safe primes derived from the base of the natural logarithm
       ("e"), with the high and low 64 bits set to 1 for efficient
@@ -241,9 +241,9 @@
       <t>A compatible TLS server that receives this extension from a
       client and selects a DHE-key-exchange ciphersuite selects one of
       the offered groups and indicates it to the client in the
-      ServerHello by sending a "negotiated_dl_dhe_groups" extension.
+      ServerHello by sending a "negotiated_ff_dhe_groups" extension.
       The "extension_data" field of this extension on the server side
-      should be a single one-byte value DiscreteLogDHEGroup.
+      should be a single one-byte value FiniteFieldDHEGroup.
       </t>
 
       <t>A TLS server MUST NOT select a named group that was not
@@ -256,13 +256,13 @@
         comparable or greater strength than the server's public key,
         the server SHOULD select a DHE group at least as strong as the
         server's public key.  For example, if the server has a
-        3072-bit RSA key, and the client offers only dldhe2432 and
-        dldhe4096, the server SHOULD select dldhe4096.
+        3072-bit RSA key, and the client offers only ffdhe2432 and
+        ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
       <section anchor="ServerDHParams" title="ServerDHParams changes">
         <t>
-          When the server sends the "negotiated_dl_dhe_groups"
+          When the server sends the "negotiated_ff_dhe_groups"
           extension in the ServerHello, the ServerDHParams member of
           the subsequent ServerKeyExchange message should indicate a
           one-byte zero value (0) in place of dh_g and the identifier
@@ -289,7 +289,7 @@
       </section>
     </section>
     <section anchor="optimizations" title="Optimizations">
-      <t>In a successfully negotiated discrete log DH group key
+      <t>In a successfully negotiated finite field DH group key
       exchange, both peers know that the group in question uses a safe
       prime as a modulus, and that the group in use is of size p-1 or
       (p-1)/2.  This allows at least three optimizations that can be
@@ -309,7 +309,7 @@
       </section>
       <section anchor="short-exponents" title="Short Exponents">
         <t>
-          Traditional Discrete Log Diffie-Hellman has each peer choose
+          Traditional Finite Field Diffie-Hellman has each peer choose
           their secret exponent from the range [2,p-2].  Using
           exponentiation by squaring, this means each peer must do
           roughly 2*log_2(p) multiplications, twice (once for the
@@ -322,7 +322,7 @@
           security.  Each named group indicates its approximate
           security level, and provides a lower-bound on the range of
           secret exponents that should preserve it.  For example,
-          rather than doing 2*2*2432 multiplications for a dldhe2432
+          rather than doing 2*2*2432 multiplications for a ffdhe2432
           handshake, each peer can choose to do 2*2*224
           multiplications by choosing their secret exponent in the
           range [2,2^224] and still keep the approximate 112-bit
@@ -405,7 +405,7 @@
         <t>
           Note that in at least one known attack against TLS <xref
           target="SECURE-RESUMPTION"/>, a malicious server uses a
-          deliberately broken discrete log DHE group to impersonate
+          deliberately broken finite field DHE group to impersonate
           the client to a different server.
         </t>
       </section>
@@ -444,13 +444,13 @@ cryptographic levels?)
       </t>
 
       <t>
-        <xref target="named_group_registry" /> defines a TLS Discrete
-        Log DHE Named Group Registry.  Each entry in this registry
+        <xref target="named_group_registry" /> defines a TLS Finite
+        Field DHE Named Group Registry.  Each entry in this registry
         indicates the group itself, its derivation, its expected
         strength (estimated roughly from guidelines in <xref
         target="ECRYPTII"/>), and whether it is recommended for use in
         TLS key exchange at the given security level.  This registry
-        may be updated by the addition of new discrete log groups, and
+        may be updated by the addition of new finite field groups, and
         by reassessments of the security level or utility to TLS of
         any already present group.  Updates are made by <xref
         target="RFC5226">IETF Review</xref>, and should consider <xref
@@ -523,8 +523,8 @@ cryptographic levels?)
       </section>
       <section title="DHE only">
         <t>
-          Note that this extension specifically targets only discrete
-          log-based Diffie-Hellman ephemeral key exchange mechanisms.
+          Note that this extension specifically targets only finite
+          field-based Diffie-Hellman ephemeral key exchange mechanisms.
           It does not cover the non-ephemeral DH key exchange
           mechanisms, nor does it cover elliptic curve-based DHE key
           exchange, which has its own list of named groups.
@@ -532,7 +532,7 @@ cryptographic levels?)
       </section>
       <section title="Deprecating weak groups">
         <t>
-          Advances in hardware or in discrete log cryptanalysis may
+          Advances in hardware or in finite field cryptanalysis may
           cause some of the negotiated groups to not provide the
           desired security margins, as indicated by the estimated work
           factor of an adversary to discover the premaster secret (and
@@ -552,9 +552,9 @@ cryptographic levels?)
       </section>
       <section anchor="choice-of-groups" title="Choice of groups">
         <t>
-          <xref target="STRONGSWAN-IKE">Other lists of named discrete
-          log Diffie-Hellman groups</xref> exist.  This draft chooses
-          to not reuse them for several reasons:
+          <xref target="STRONGSWAN-IKE">Other lists of named finite
+          field Diffie-Hellman groups</xref> exist.  This draft
+          chooses to not reuse them for several reasons:
           <list>
             <t>
               Using the same groups in multiple protocols increases
@@ -574,8 +574,8 @@ cryptographic levels?)
               groups avoids these failure modes entirely.
             </t>
             <t>
-              Other lists of named DL DHE groups are not collected in
-              a single IANA registry, or are mixed with non-DL DHE
+              Other lists of named FF DHE groups are not collected in
+              a single IANA registry, or are mixed with non-FF DHE
               groups, which makes them inconvenient for re-use in a
               TLS DHE key exchange context.
             </t>
@@ -584,7 +584,7 @@ cryptographic levels?)
       </section>
       <section title="Timing attacks">
         <t>
-          Any implementation of discrete log Diffie-Hellman key
+          Any implementation of finite field Diffie-Hellman key
           exchange should use constant-time modular-exponentiation
           implementations.  This is particularly true for those
           implementations that ever re-use DHE secret keys (so-called
@@ -593,10 +593,10 @@ cryptographic levels?)
           situation).
         </t>
       </section>
-      <section title="Replay attacks from non-negotiated DL DHE">
+      <section title="Replay attacks from non-negotiated FF DHE">
         <t>
           <xref target="SECURE-RESUMPTION" /> shows a malicious
-          peer using a bad DL DHE group to maneuver a client into
+          peer using a bad FF DHE group to maneuver a client into
           selecting a pre-master secret of the peer's choice, which
           can be replayed to another server using a non-DHE key
           exchange, and can then be bootstrapped to replay client
@@ -605,10 +605,10 @@ cryptographic levels?)
         <t>
           To prevent this attack (barring the fixes proposed in <xref
           target="SESSION-HASH"/>), a client would need not only to implement this
-          draft, but also to reject non-negotiated DL DHE ciphersuites
+          draft, but also to reject non-negotiated FF DHE ciphersuites
           whose group structure it cannot afford to verify.  Such a
           client would need to abort the initial handshake and
-          reconnect to the server in question without listing any DL
+          reconnect to the server in question without listing any FF
           DHE ciphersuites on the subsequent connection.
         </t>
         <t>
@@ -776,7 +776,7 @@ cryptographic levels?)
 
     <section anchor="named_group_registry" title="Named Group Registry">
       <t>
-        The primes in these discrete log groups are all safe primes,
+        The primes in these finite field groups are all safe primes,
         that is, a prime p is a safe prime when q = (p-1)/2 is also
         prime.  Where e is the base of the natural logarithm, and
         square brackets denote the floor operation, the groups which
@@ -795,7 +795,7 @@ cryptographic levels?)
         parameters in a different way, but must be clear about how the
         parameters were derived.
       </t>
-      <section anchor="dldhe2432" title="dldhe2432">
+      <section anchor="ffdhe2432" title="ffdhe2432">
         <t>The 2432-bit group has registry value 0, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^2432 - 2^2368 + {[2^2302 * e] + 2111044} * 2^64 - 1</t>
@@ -820,12 +820,12 @@ cryptographic levels?)
         <t>The generator is: g = 2</t>
         <t>The group size is (p-1)/2</t>
         <t>The estimated symmetric-equivalent strength of this group is 112 bits.</t>
-        <t>Peers using dldhe2432 that want to optimize their key
+        <t>Peers using ffdhe2432 that want to optimize their key
         exchange with a <xref target="short-exponents">short
         exponent</xref> should choose a secret key of at least 224
         bits.</t>
       </section>
-      <section anchor="dldhe3072" title="dldhe3072">
+      <section anchor="ffdhe3072" title="ffdhe3072">
         <t>The 3072-bit prime has registry value 1, and is calcluated
         from the following formula:</t>
         <t>p = 2^3072 - 2^3008 + {[2^2942 * e] + 2625351} * 2^64 -1</t>
@@ -853,13 +853,13 @@ cryptographic levels?)
         <t>The generator is: g = 2</t>
         <t>The group size is: (p-1)/2</t>
         <t>The estimated symmetric-equivalent strength of this group is 125 bits.</t>
-        <t>Peers using dldhe3072 that want to optimize their key
+        <t>Peers using ffdhe3072 that want to optimize their key
         exchange with a <xref target="short-exponents">short
         exponent</xref> should choose a secret key of at least 250
         bits.</t>
       </section>
 
-      <section anchor="dldhe4096" title="dldhe4096">
+      <section anchor="ffdhe4096" title="ffdhe4096">
         <t>The 4096-bit group has registry value 2, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^4096 - 2^4032 + {[2^3966 * e] + 5736041} * 2^64 - 1</t>
@@ -894,12 +894,12 @@ cryptographic levels?)
         <t>The group size is: (p-1)/2</t>
         <t>The estimated symmetric-equivalent strength of this group
         is 150 bits.</t>
-        <t>Peers using dldhe4096 that want to optimize their key
+        <t>Peers using ffdhe4096 that want to optimize their key
         exchange with a <xref target="short-exponents">short
         exponent</xref> should choose a secret key of at least 300
         bits.</t>
       </section>
-      <section anchor="dldhe6144" title="dldhe6144">
+      <section anchor="ffdhe6144" title="ffdhe6144">
         <t>The 6144-bit group has registry value 3, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^6144 - 2^6080 + {[2^6014 * e] + 15705020} * 2^64 - 1</t>
@@ -944,12 +944,12 @@ cryptographic levels?)
         <t>The group size is: (p-1)/2</t>
         <t>The estimated symmetric-equivalent strength of this group
         is 175 bits.</t>
-        <t>Peers using dldhe6144 that want to optimize their key
+        <t>Peers using ffdhe6144 that want to optimize their key
         exchange with a <xref target="short-exponents">short
         exponent</xref> should choose a secret key of at least 350
         bits.</t>
       </section>
-      <section anchor="dldhe8192" title="dldhe8192">
+      <section anchor="ffdhe8192" title="ffdhe8192">
         <t>The 8192-bit group has registry value 4, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^8192 - 2^8128 + {[2^8062 * e] + 10965728} * 2^64 - 1</t>
@@ -1005,7 +1005,7 @@ cryptographic levels?)
         <t>The group size is: (p-1)/2</t>
         <t>The estimated symmetric-equivalent strength of this group
         is 192 bits.</t>
-        <t>Peers using dldhe8192 that want to optimize their key
+        <t>Peers using ffdhe8192 that want to optimize their key
         exchange with a <xref target="short-exponents">short
         exponent</xref> should choose a secret key of at least 384
         bits.</t>

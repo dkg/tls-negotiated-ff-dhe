@@ -1,4 +1,4 @@
-TITLE = tls-negotiated-dl-dhe
+TITLE = tls-negotiated-ff-dhe
 OUTPUTS = $(TITLE).txt $(TITLE).nroff $(TITLE).html
 
 all: $(OUTPUTS)
