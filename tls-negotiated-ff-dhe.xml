@@ -133,11 +133,11 @@
       to use DHE only if the server can offer a stronger group (and
       are willing to use a non-PFS key-exchange mechanism otherwise).
       The server has no way of knowing which type of client is
-      connecting, but must select DHE parameters with insufficient
+      connecting, but must select DH parameters with insufficient
       knowledge.</t>
 
       <t>Additionally, the DH parameters chosen by the server may have
-      a known structure which renders them secure against small
+      a known structure which renders them secure against a small
       subgroup attack, but a client receiving an arbitrary p has no
       efficient way to verify that the structure of a new group is
       reasonable for use.</t>
@@ -164,7 +164,7 @@
           The term "DHE" is used in this document to refer to the
           finite-field-based Diffie-Hellman ephemeral key
           exchange mechanism in TLS.  TLS also supports
-          elliptic-curve-based Diffie Hellman ephemeral key exchanges,
+          elliptic-curve-based Diffie-Hellman ephemeral key exchanges,
           but this document does not discuss their use.  Mentions of
           DHE here refer strictly to finite-field-based DHE, and not
           to ECDHE.
@@ -211,7 +211,7 @@
       <t>
         The use of the base of the natural logarithm here is as a
         "nothing-up-my-sleeve" number.  The goal is to guarantee that
-        the bits in the middle of the modulus that they are
+        the bits in the middle of the modulus are
         effectively random, while avoiding any suspicion that the
         primes have secretly been selected to be weak according to
         some secret criteria. <xref target="RFC3526"/> used pi for
