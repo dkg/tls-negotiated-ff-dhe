@@ -164,7 +164,7 @@
           The term "DHE" is used in this document to refer to the
           finite-field-based Diffie-Hellman ephemeral key
           exchange mechanism in TLS.  TLS also supports
-          elliptic-curve-based Diffie-Hellman ephemeral key exchanges,
+          elliptic-curve-based Diffie-Hellman (ECDHE) ephemeral key exchanges,
           but this document does not discuss their use.  Mentions of
           DHE here refer strictly to finite-field-based DHE, and not
           to ECDHE.
