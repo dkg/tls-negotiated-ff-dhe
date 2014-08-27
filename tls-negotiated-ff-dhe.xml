@@ -304,7 +304,8 @@
 
         <t>To reach the same assurance with an unknown group, the
         client would need to verify the primality of the modulus,
-        learn the factors of p-1, and test Y against each factor.
+        learn the factors of p-1, and test both the generator g and Y
+        against each factor to avoid small subgroup attacks.
         </t>
       </section>
       <section anchor="short-exponents" title="Short Exponents">
@@ -403,8 +404,9 @@
           modulus, though.
         </t>
         <t>
-          Note that in at least one known attack against TLS <xref
-          target="SECURE-RESUMPTION"/>, a malicious server uses a
+          Note that in several known attacks against TLS and SSL <xref
+          target="SECURE-RESUMPTION"/> <xref target="CROSS-PROTOCOL"/>
+          <xref target="SSL3-ANALYSIS"/>, a malicious server uses a
           deliberately broken finite field DHE group to impersonate
           the client to a different server.
         </t>
@@ -708,6 +710,45 @@ cryptographic levels?)
           </author>
 
           <date month="October" year="2013" />
+        </front>
+      </reference>
+
+      <reference anchor="CROSS-PROTOCOL"
+                 target="http://www.cosic.esat.kuleuven.be/publications/article-2216.pdf">
+        <front>
+          <title>A Cross-Protocol Attack on the TLS Protocol</title>
+
+          <author initials="N." surname="Mavrogiannopolous" fullname="Nikos Mavrogiannopoulos">
+            <organization>KU Lueven</organization>
+          </author>
+          <author initials="F." surname="Vercauteren" fullname="Frederik Vercauteren">
+            <organization>KU Lueven</organization>
+          </author>
+          <author initials="V." surname="Velichkov" fullname="Vesselin Velichkov">
+            <organization>University of Luxembourg</organization>
+          </author>
+          <author initials="B." surname="Preneel" fullname="Bart Preneel">
+            <organization>KU Lueven</organization>
+          </author>
+
+          <date month="October" year="2012" />
+        </front>
+      </reference>
+
+      <reference anchor="SSL3-ANALYSIS"
+                 target="https://www.schneier.com/paper-ssl.pdf">
+        <front>
+          <title>Analysis of the SSL 3.0 protocol</title>
+
+          <author initials="B." surname="Schneier" fullname="Bruce Schneier">
+            <organization>Counterpane Systems</organization>
+          </author>
+
+          <author initials="D." surname="Wagner" fullname="David Wagner">
+            <organization>University of California, Berkeley</organization>
+          </author>
+
+          <date year="1996" />
         </front>
       </reference>
 
