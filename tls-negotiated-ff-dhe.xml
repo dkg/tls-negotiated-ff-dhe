@@ -9,8 +9,9 @@
 <!ENTITY RFC2119 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC3526 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3526.xml">
 <!ENTITY RFC4419 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4419.xml">
-<!ENTITY RFC5226 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5226.xml">
+<!ENTITY RFC4492 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4492.xml">
 <!ENTITY RFC5246 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml">
+<!ENTITY RFC7027 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7027.xml">
 ]>
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -38,7 +39,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-tls-negotiated-ff-dhe-01" ipr="trust200902">
+<rfc category="info" docName="draft-ietf-tls-negotiated-ff-dhe-02" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
@@ -92,7 +93,7 @@
 	 If this element is not present, the default is "Network Working Group",
          which is used by the RFC Editor as a nod to the history of the IETF. -->
 
-    <keyword>Diffie-Hellman, Discrete Logarithm, Finite Field, Transport Layer Security, TLS, Negotiation, Extensions</keyword>
+    <keyword>Diffie-Hellman, Discrete Logarithm, Finite Field, Transport Layer Security, TLS, Negotiation</keyword>
 
     <!-- Keywords will be incorporated into HTML output
          files in a meta tag but they have no effect on text or nroff
@@ -106,9 +107,10 @@
       shortcomings arise from lack of clarity about which DH group
       parameters TLS servers should offer and clients should accept.
       This document offers a solution to these shortcomings for
-      compatible peers by establishing a registry of DH parameters
-      with known structure and a mechanism for peers to indicate
-      support for these groups.</t>
+      compatible peers by using a section of the TLS "EC Named Curve
+      Registry" to establish common DH parameters with known structure
+      and a mechanism for peers to negotiate support for these
+      groups.</t>
     </abstract>
   </front>
 
@@ -142,13 +144,16 @@
       efficient way to verify that the structure of a new group is
       reasonable for use.</t>
 
-      <t>This extension solves these problems with a registry of
-      groups of known reasonable structure, an extension for clients
-      to advertise support for them and servers to select them, and
-      guidance for compliant peers to take advantage of the additional
-      security, availability, and efficiency offered.</t>
+      <t>This modification to TLS solves these problems by using a
+      section of the "EC Named Curves" registry to select common DH
+      groups with known structure; defining the use of the
+      "elliptic_curves(10)" extension for clients advertising support
+      for DHE with these groups; and defining how a server indicates
+      acceptance of a proposed common group.  This document also
+      provides guidance for compliant peers to take advantage of the
+      additional security, availability, and efficiency offered.</t>
 
-      <t>The use of this extension by one compliant peer when
+      <t>The use of this mechanism by one compliant peer when
       interacting with a non-compliant peer should have no detrimental
       effects.</t>
 
@@ -161,13 +166,17 @@
 
       <section title="Vocabulary">
         <t>
-          The term "DHE" is used in this document to refer to the
-          finite-field-based Diffie-Hellman ephemeral key
+          The terms "DHE" or "FFDHE" are used in this document to
+          refer to the finite-field-based Diffie-Hellman ephemeral key
           exchange mechanism in TLS.  TLS also supports
-          elliptic-curve-based Diffie-Hellman (ECDHE) ephemeral key exchanges,
-          but this document does not discuss their use.  Mentions of
-          DHE here refer strictly to finite-field-based DHE, and not
-          to ECDHE.
+          elliptic-curve-based Diffie-Hellman (ECDHE) ephemeral key
+          exchanges <xref target="RFC4492"/>, but this document does
+          not document their use.  A registry previously used only by
+          ECHDE-capable implementations is expanded in this document
+          to cover FFDHE groups as well.  "FFDHE ciphersuites" is used
+          in this document to refer exclusively to ciphersuites with
+          FFDHE key exchange mechanisms, but note that these suites
+          are typically labeled with a TLS_DHE_ prefix.
         </t>
       </section>
     </section>
@@ -178,33 +187,45 @@
       preferences for stronger key exchange by using this
       mechanism.</t>
 
-      <t>The client SHOULD send an extension of type
-      "negotiated_ff_dhe_groups" in the ClientHello, indicating a
-      list of known finite field Diffie-Hellman groups, ordered from
-      most preferred to least preferred.</t>
+      <t>We use previously-unallocated codepoints within the extension
+      currently known as "elliptic_curves" (section 5.1.1. of <xref
+      target="RFC4492"/>) to indicate known finite field groups.  The
+      extension's semantics is expanded from "known elliptic curve
+      groups" to "known groups".  The semantics of the extension's
+      data type (enum NamedCurve) is also expanded from "named curve"
+      to "named group".</t>
 
-      <t>The "extension_data" field of this extension SHALL contain
-      "FiniteFieldDHEGroups" where:</t>
+      <t>The compatible client that wants to be able to negotiate
+      strong FFDHE SHOULD send an extension of type "elliptic_curves"
+      (<xref target="RFC4492"/>) in the ClientHello, and include a
+      list of known FFDHE groups in the extension data, ordered from
+      most preferred to least preferred.  If the client also supports
+      and wants to offer ECDHE key exchange, it MUST use a single
+      elliptic_curves extension to include all supported groups (both
+      ECDHE and FFDHE groups).  The ordering SHOULD be based on client
+      preference, but see <xref target="preference_ordering"/> for
+      more nuance.</t>
+
+      <t>Here are the new code points for the NamedCurve registry:</t>
 
       <figure>
         <artwork><![CDATA[
-      enum {
-          ffdhe2432(0), ffdhe3072(1), ffdhe4096(2),
-          ffdhe6144(3), ffdhe8192(4), (255)
-      } FiniteFieldDHEGroup;
-
-      struct {
-          FiniteFieldDHEGroup finite_field_dhe_group_list<1..2^8-1>;
-      } FiniteFieldDHEGroups;
+        enum {
+        // other already defined elliptic curves (see RFC 4492)
+            ffdhe2432(256), ffdhe3072(257), ffdhe4096(258),
+            ffdhe6144(259), ffdhe8192(260),
+        //
+        } NamedCurve;
             ]]></artwork>
       </figure>
 
-      <t>A client that offers this extension SHOULD include at least
-      one DHE-key-exchange ciphersuite in the Client Hello.</t>
+      <t>A client that offers any of these values in the NamedCurves
+      extension SHOULD ALSO include at least one FFDHE ciphersuite in
+      the Client Hello.</t>
 
-      <t>The known groups defined by the FiniteFieldDHEGroup registry
-      are listed in <xref target="named_group_registry"/>.  These are
-      all safe primes derived from the base of the natural logarithm
+      <t>These additions to the Named Curve registry are described in
+      detail in <xref target="named_group_registry"/>.  They are all
+      safe primes derived from the base of the natural logarithm
       ("e"), with the high and low 64 bits set to 1 for efficient
       Montgomery or Barrett reduction.
       </t>
@@ -223,58 +244,68 @@
       perform a DH key exchange using that group.</t>
     </section>
     <section anchor="server" title="Server Behavior">
-      <t>A TLS server MUST NOT send the NegotiatedDHParams extension
-      to a client that does not offer it first.
-      </t>
-
-      <t>A compatible TLS server that receives this extension from a
-      client SHOULD NOT select a DHE ciphersuite if it is unwilling to
-      use one of the DH groups named by the client.  In this case, it
-      SHOULD select an acceptable non-DHE ciphersuite from the
+      <t>If a compatible TLS server receives a NamedCurves extension
+      from a client that includes any FFDHE groups, the server SHOULD
+      NOT select an FFDHE ciphersuite if it is unwilling to use one of
+      the FFDHE groups named by the client.  In this case, the server
+      SHOULD select an acceptable non-FFDHE ciphersuite from the
       client's offered list.  If the extension is present, none of the
       client's offered groups are acceptable by the server, and none
-      of the client's proposed non-DHE ciphersuites are acceptable to
-      the server, the server SHOULD end the connection with a fatal
+      of the client's proposed non-FFDHE ciphersuites are acceptable
+      to the server, the server SHOULD end the connection with a fatal
       TLS alert of type insufficient_security.
       </t>
       
-      <t>A compatible TLS server that receives this extension from a
-      client and selects a DHE-key-exchange ciphersuite selects one of
-      the offered groups and indicates it to the client in the
-      ServerHello by sending a "negotiated_ff_dhe_groups" extension.
-      The "extension_data" field of this extension on the server side
-      should be a single one-byte value FiniteFieldDHEGroup.
+      <t>A compatible TLS server that receives the NamedCurve
+      extension with FFDHE codepoints in it, and which selects an
+      FFDHE ciphersuite MUST select one of the offered groups and
+      indicates the choice of groups to the client by sending a
+      specially-formatted ServerDHParams as described below.
+      </t>
+
+      <t>A TLS server MUST NOT send the specially-formatted
+      ServerDHParams message to a client that did not offer an FFDHE
+      group in the NamedCurves extension first.
       </t>
 
       <t>A TLS server MUST NOT select a named group that was not
       offered by the client.
       </t>
 
+      <t>A TLS server MUST NOT select an FFDHE ciphersuite if the
+      client did not offer one, even if the client offered an FFDHE
+      group in the NamedCurves extension.
+      </t>
+
       <t>
-        If a non-anonymous DHE ciphersuite is chosen, and the TLS
-        client has used this extension to offer a DHE group of
+        If a non-anonymous FFDHE ciphersuite is chosen, and the TLS
+        client has used this extension to offer an FFDHE group of
         comparable or greater strength than the server's public key,
-        the server SHOULD select a DHE group at least as strong as the
-        server's public key.  For example, if the server has a
+        the server SHOULD select an FFDHE group at least as strong as
+        the server's public key.  For example, if the server has a
         3072-bit RSA key, and the client offers only ffdhe2432 and
         ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
       <section anchor="ServerDHParams" title="ServerDHParams changes">
         <t>
-          When the server sends the "negotiated_ff_dhe_groups"
-          extension in the ServerHello, the ServerDHParams member of
-          the subsequent ServerKeyExchange message should indicate a
-          one-byte zero value (0) in place of dh_g and the identifier
-          of the named group in place of dh_p, represented as a
-          one-byte value.  dh_Ys must be transmitted as normal.
+          When the compatible server selects an FFDHE ciphersuite for
+          a client who offered FFDHE groups via Named Curves, the
+          ServerDHParams member of the subsequent ServerKeyExchange
+          message should indicate a one-byte zero value (0) in place
+          of dh_g to indicate support for a pre-known FFDHE group.  It
+          places the value of the named group (represented as a
+          two-byte value) in place of dh_p.  dh_Ys must be transmitted
+          as normal.
         </t>
 
         <t>
           This re-purposing of dh_p and dh_g is unambiguous: there are
           no groups with a generator of 0, and no implementation
-          should accept a modulus of size &lt; 9 bits.  This change
-          serves two purposes:
+          should accept a modulus of size &lt; 17 bits.  Aside from
+          making the ServerDHParams an unambiguous indicator of
+          support for named FFDHE groups, this change serves two
+          purposes:
           <list>
             <t>
               The size of the handshake is reduced (significantly, in
@@ -282,21 +313,22 @@
             </t>
             <t>
               The signed struct should not be re-playable in a subsequent
-            key exchange that does not indicate named DH groups.
+              key exchange that does not indicate named FFDHE groups.
             </t>
           </list>
         </t>
+
       </section>
     </section>
     <section anchor="optimizations" title="Optimizations">
-      <t>In a successfully negotiated finite field DH group key
-      exchange, both peers know that the group in question uses a safe
+      <t>In a key exchange with a successfully negotiated known FFDHE
+      group, both peers know that the group in question uses a safe
       prime as a modulus, and that the group in use is of size p-1 or
       (p-1)/2.  This allows at least three optimizations that can be
       used to improve performance.
       </t>
       <section anchor="peercheck" title="Checking the Peer's Public Key">
-        <t>Peers should validate the each other's public key Y
+        <t>Peers should validate each other's public key Y
         (dh_Ys offered by the server or DH_Yc offered by the client) by
         ensuring that 1 &lt; Y &lt; p-1.  This simple check ensures that
         the remote peer is properly behaved and isn't forcing the local
@@ -308,7 +340,7 @@
         against each factor to avoid small subgroup attacks.
         </t>
       </section>
-      <section anchor="short-exponents" title="Short Exponents">
+      <section anchor="short_exponents" title="Short Exponents">
         <t>
           Traditional Finite Field Diffie-Hellman has each peer choose
           their secret exponent from the range [2,p-2].  Using
@@ -335,9 +367,9 @@
           target="RFC4419"/>).
         </t>
       </section>
-      <section anchor="tableacceleration" title="Table Acceleration">
+      <section anchor="table_acceleration" title="Table Acceleration">
         <t>
-          Peers wishing to further accelerate DHE key exchange can
+          Peers wishing to further accelerate FFDHE key exchange can
           also pre-compute a table of powers of the generator of a
           known group.  This is a memory vs. time tradeoff, and it
           only accelerates the first exponentiation of the ephemeral
@@ -346,34 +378,77 @@
         </t>
       </section>
     </section>
+    <section anchor="operational_considerations" title="Operational Considerations">
+      <section anchor="preference_ordering" title="Preference Ordering">
+        <t>The ordering of named groups in the NamedCurves extension
+        may contain some ECDHE groups and some FFDHE groups.  These
+        SHOULD be ranked in preference order.
+        </t>
+        <t>However, the ClientHello also contains list of desired
+        ciphersuites, also ranked in preference order.  This presents
+        the possibility of conflicted preferences.  For example, if
+        the ClientHello contains a CipherSuite with two choices in
+        order &lt;TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA&gt; and the NamedCurves
+        Extension contains two choices in order
+        &lt;secp256r1,ffdhe3072&gt; then there is a clear
+        contradiction.  Clients MUST NOT present such a contradiction.
+        A server that encounters such an contradiction when selecting
+        between an ECDHE or FFDHE key exchange mechanism while trying
+        to respect client preferences SHOULD give priority to the
+        NamedCurves extension (in the example case, it should select
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA with secp256r1.
+        </t>
+        <t>More subtly, it is possible for a client to present an
+        ambiguity that is not a clear contradiction.  For example, the
+        ClientHello could be the same as the above example, but
+        NamedCurves could be:
+        &lt;ffdhe8192,secp384p1,ffdhe3072,secp256r1&gt;.  Clients MAY
+        present such a mixed set of groups. In this case, a server
+        configured to respect client preferences and with support for
+        all listed groups SHOULD select
+        TLS_DHE_RSA_WITH_AES_128_CBC_SHA with ffdhe8192.  A server
+        configured to respect client preferences and with support for
+        only secp384p1 and ffdhe3072 SHOULD select
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA with secp384p1.
+        </t>
+      </section>
+      
+    </section>
     <section anchor="questions" title="Open Questions">
       <t>[This section should be removed, and questions resolved,
       before any formalization of this draft]
       </t>
 
       <section title="Server Indication of support">
-        <t>Some servers will support this extension, but for whatever
+        <t>Some servers will support this mechanism, but for whatever
         reason decide to not negotiate a ciphersuite with DHE key
         exchange at all.  Some possible reasons include:
         <list>
-          <t>The client indicated that a server-supported non-DHE
-          ciphersuite was preferred over all DHE ciphersuites, and the
-          server honors that preference.</t>
-          <t>The server prefers a client-supported non-DHE ciphersuite
-          over all DHE ciphersuites, and selects it unilaterally.</t>
-          <t>The server would have chosen a DHE ciphersuite, but none
-          of the client's offered groups are acceptable to the
+          <t>The client indicated that a server-supported non-FFDHE
+          ciphersuite was preferred over all FFDHE ciphersuites, and
+          the server honors that preference.</t>
+          <t>The server prefers a client-supported non-FFDHE
+          ciphersuite over all FFDHE ciphersuites, and selects it
+          unilaterally.</t>
+          <t>The server would have chosen a FFDHE ciphersuite, but
+          none of the client's offered groups are acceptable to the
           server,</t>
         </list>
 
-        Clients will not know that such a server
-        supports the extension.</t>
+        Clients will not know that such a server supports this
+        mechanism.</t>
 
         <t>Should we offer a way for a server to indicate its support
-        for this extension to a compatible client in this case?</t>
+        for this mechanism to a compatible client in this case?</t>
         
         <t>Should the server have a way to advertise that it supports
-        this extension even if the client does not offer it?</t>
+        this mechanism even if the client does not offer an FFDHE
+        group in NamedCurves, or does not offer any NamedCurve at
+        all?</t>
+
+        <t>[dkg] I think the answer here is that we do not care about
+        signalling this support to the client in general.</t>
       </section>
       <section title="Normalizing Weak Groups">
         <t>Is there any reason to include a weak group in the list of
@@ -388,8 +463,8 @@
       <section title="Arbitrary Groups">
         <t>
           This spec currently doesn't indicate any support for groups
-          other than the named groups.  Other DHE specifications have
-          moved away from staticly-named groups with the
+          other than the named groups.  Other FFDHE specifications
+          have moved away from staticly-named groups with the
           explicitly-stated rationale of reducing the incentive for
           precomputation-driven attacks on any specific group
           (e.g. section 1 of <xref target="RFC4419"/>).  However,
@@ -407,8 +482,8 @@
           Note that in several known attacks against TLS and SSL <xref
           target="SECURE-RESUMPTION"/> <xref target="CROSS-PROTOCOL"/>
           <xref target="SSL3-ANALYSIS"/>, a malicious server uses a
-          deliberately broken finite field DHE group to impersonate
-          the client to a different server.
+          deliberately broken FFDHE group to impersonate the client to
+          a different server.
         </t>
       </section>
     </section>
@@ -428,8 +503,9 @@ cryptographic levels?)
       <t>
         Thanks to Fedor Brunner, Dave Fergemann, Sandy Harris, Watson
         Ladd, Nikos Mavrogiannopolous, Niels M&#246;ller, Kenny
-        Paterson, and Tom Ritter for their comments and suggestions on
-        this draft.  Any mistakes here are not theirs.
+        Paterson, Eric Rescorla, Tom Ritter, Martin Thomson, and Sean
+        Turner for their comments and suggestions on this draft.  Any
+        mistakes here are not theirs.
       </t>
     </section>
 
@@ -437,27 +513,52 @@ cryptographic levels?)
 
     <section anchor="IANA" title="IANA Considerations">
       <t>
-        This document defines a new TLS extension,
-        "negotiated_dh_group", assigned a value of XXX from the TLS
-        ExtensionType registry defined in section 12 of <xref
-        target="RFC5246"/>.  This value is used as the extension
-        number for the extensions in both the client hello message and
-        the server hello message.
+        IANA maintains the registry currently known as EC Named Curves
+        (originally defined in <xref target="RFC4492"/> and updated by
+        <xref target="RFC7027"/>) at <eref
+        target="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8"/>.
+      </t>
+      <t>
+        This document expands the semantics of this registry slightly,
+        to include groups based on finite fields in addition to groups
+        based on elliptic curves.
+      </t>
+      <t>
+        This document allocates five codepoints in the registry, as follows:
       </t>
 
-      <t>
-        <xref target="named_group_registry" /> defines a TLS Finite
-        Field DHE Named Group Registry.  Each entry in this registry
-        indicates the group itself, its derivation, its expected
-        strength (estimated roughly from guidelines in <xref
-        target="ECRYPTII"/>), and whether it is recommended for use in
-        TLS key exchange at the given security level.  This registry
-        may be updated by the addition of new finite field groups, and
-        by reassessments of the security level or utility to TLS of
-        any already present group.  Updates are made by <xref
-        target="RFC5226">IETF Review</xref>, and should consider <xref
-        target="Client-Fingerprinting"/>.
-      </t>
+      <texttable align="left">
+        <ttcol>Value</ttcol>
+        <ttcol>Description</ttcol>
+        <ttcol>DTLS-OK</ttcol>
+        <ttcol>Reference</ttcol>
+
+        <c>256</c>
+        <c>ffdhe2432</c>
+        <c>Y</c>
+        <c>[this document]</c>
+
+        <c>257</c>
+        <c>ffdhe3072</c>
+        <c>Y</c>
+        <c>[this document]</c>
+
+        <c>258</c>
+        <c>ffdhe4096</c>
+        <c>Y</c>
+        <c>[this document]</c>
+
+        <c>259</c>
+        <c>ffdhe6144</c>
+        <c>Y</c>
+        <c>[this document]</c>
+
+        <c>260</c>
+        <c>ffdhe8192</c>
+        <c>Y</c>
+        <c>[this document]</c>
+      </texttable> 
+
    </section>
 
     <section anchor="Security" title="Security Considerations">
@@ -656,6 +757,11 @@ cryptographic levels?)
     <references title="Normative References">
       <!--?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
       &RFC2119;
+
+      &RFC4492;
+
+      &RFC5246;
+
     </references>
 
     <references title="Informative References">
@@ -664,9 +770,7 @@ cryptographic levels?)
 
       &RFC4419;
 
-      &RFC5226;
-
-      &RFC5246;
+      &RFC7027;
 
 
 
@@ -817,6 +921,15 @@ cryptographic levels?)
 
     <section anchor="named_group_registry" title="Named Group Registry">
       <t>
+        Each description below indicates the group itself, its
+        derivation, its expected strength (estimated roughly from
+        guidelines in <xref target="ECRYPTII"/>), and whether it is
+        recommended for use in TLS key exchange at the given security
+        level.  It is not recommended to add furtherw finite field
+        groups to the NamedCurves registry; any attempt to do so
+        should consider <xref target="Client-Fingerprinting"/>.
+      </t>
+      <t>
         The primes in these finite field groups are all safe primes,
         that is, a prime p is a safe prime when q = (p-1)/2 is also
         prime.  Where e is the base of the natural logarithm, and
@@ -837,7 +950,7 @@ cryptographic levels?)
         parameters were derived.
       </t>
       <section anchor="ffdhe2432" title="ffdhe2432">
-        <t>The 2432-bit group has registry value 0, and is calcluated
+        <t>The 2432-bit group has registry value 256, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^2432 - 2^2368 + {[2^2302 * e] + 2111044} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
@@ -880,12 +993,12 @@ cryptographic levels?)
       </figure>
         <t>The estimated symmetric-equivalent strength of this group is 112 bits.</t>
         <t>Peers using ffdhe2432 that want to optimize their key
-        exchange with a <xref target="short-exponents">short
+        exchange with a <xref target="short_exponents">short
         exponent</xref> should choose a secret key of at least 224
         bits.</t>
       </section>
       <section anchor="ffdhe3072" title="ffdhe3072">
-        <t>The 3072-bit prime has registry value 1, and is calcluated
+        <t>The 3072-bit prime has registry value 257, and is calcluated
         from the following formula:</t>
         <t>p = 2^3072 - 2^3008 + {[2^2942 * e] + 2625351} * 2^64 -1</t>
         <t>The hexadecimal representation of p is:</t>
@@ -934,13 +1047,13 @@ cryptographic levels?)
       </figure>
         <t>The estimated symmetric-equivalent strength of this group is 125 bits.</t>
         <t>Peers using ffdhe3072 that want to optimize their key
-        exchange with a <xref target="short-exponents">short
+        exchange with a <xref target="short_exponents">short
         exponent</xref> should choose a secret key of at least 250
         bits.</t>
       </section>
 
       <section anchor="ffdhe4096" title="ffdhe4096">
-        <t>The 4096-bit group has registry value 2, and is calcluated
+        <t>The 4096-bit group has registry value 258, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^4096 - 2^4032 + {[2^3966 * e] + 5736041} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
@@ -1002,12 +1115,12 @@ cryptographic levels?)
         <t>The estimated symmetric-equivalent strength of this group
         is 150 bits.</t>
         <t>Peers using ffdhe4096 that want to optimize their key
-        exchange with a <xref target="short-exponents">short
+        exchange with a <xref target="short_exponents">short
         exponent</xref> should choose a secret key of at least 300
         bits.</t>
       </section>
       <section anchor="ffdhe6144" title="ffdhe6144">
-        <t>The 6144-bit group has registry value 3, and is calcluated
+        <t>The 6144-bit group has registry value 259, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^6144 - 2^6080 + {[2^6014 * e] + 15705020} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
@@ -1089,12 +1202,12 @@ cryptographic levels?)
         <t>The estimated symmetric-equivalent strength of this group
         is 175 bits.</t>
         <t>Peers using ffdhe6144 that want to optimize their key
-        exchange with a <xref target="short-exponents">short
+        exchange with a <xref target="short_exponents">short
         exponent</xref> should choose a secret key of at least 350
         bits.</t>
       </section>
       <section anchor="ffdhe8192" title="ffdhe8192">
-        <t>The 8192-bit group has registry value 4, and is calcluated
+        <t>The 8192-bit group has registry value 260, and is calcluated
         from the following formula:</t>
         <t>The modulus is: p = 2^8192 - 2^8128 + {[2^8062 * e] + 10965728} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
@@ -1198,7 +1311,7 @@ cryptographic levels?)
         <t>The estimated symmetric-equivalent strength of this group
         is 192 bits.</t>
         <t>Peers using ffdhe8192 that want to optimize their key
-        exchange with a <xref target="short-exponents">short
+        exchange with a <xref target="short_exponents">short
         exponent</xref> should choose a secret key of at least 384
         bits.</t>
       </section>
