@@ -925,7 +925,7 @@ cryptographic levels?)
         derivation, its expected strength (estimated roughly from
         guidelines in <xref target="ECRYPTII"/>), and whether it is
         recommended for use in TLS key exchange at the given security
-        level.  It is not recommended to add furtherw finite field
+        level.  It is not recommended to add further finite field
         groups to the NamedCurves registry; any attempt to do so
         should consider <xref target="Client-Fingerprinting"/>.
       </t>
