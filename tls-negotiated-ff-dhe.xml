@@ -328,7 +328,7 @@
       used to improve performance.
       </t>
       <section anchor="peercheck" title="Checking the Peer's Public Key">
-        <t>Peers should validate each other's public key Y
+        <t>Peers MUST validate each other's public key Y
         (dh_Ys offered by the server or DH_Yc offered by the client) by
         ensuring that 1 &lt; Y &lt; p-1.  This simple check ensures that
         the remote peer is properly behaved and isn't forcing the local
