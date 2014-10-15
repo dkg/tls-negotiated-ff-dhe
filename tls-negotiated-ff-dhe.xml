@@ -236,7 +236,7 @@
         effectively random, while avoiding any suspicion that the
         primes have secretly been selected to be weak according to
         some secret criteria. <xref target="RFC3526"/> used pi for
-        this value. See <xref target="choice-of-groups"/> for reasons
+        this value. See <xref target="choice_of_groups"/> for reasons
         that this draft does not reuse pi.
       </t>
 
@@ -653,7 +653,7 @@ cryptographic levels?)
           are updated.
         </t>
       </section>
-      <section anchor="choice-of-groups" title="Choice of groups">
+      <section anchor="choice_of_groups" title="Choice of groups">
         <t>
           <xref target="STRONGSWAN-IKE">Other lists of named finite
           field Diffie-Hellman groups</xref> exist.  This draft
