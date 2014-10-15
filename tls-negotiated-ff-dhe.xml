@@ -521,7 +521,10 @@ cryptographic levels?)
       <t>
         This document expands the semantics of this registry slightly,
         to include groups based on finite fields in addition to groups
-        based on elliptic curves.
+        based on elliptic curves.  It should add a column "Group-Type"
+        to the registry indicating whether a given group based on
+        elliptic curves ("EC") or finite fields ("FF").  All
+        pre-existing entries should have that column set to "EC".
       </t>
       <t>
         This document allocates five codepoints in the registry, as follows:
@@ -531,31 +534,37 @@ cryptographic levels?)
         <ttcol>Value</ttcol>
         <ttcol>Description</ttcol>
         <ttcol>DTLS-OK</ttcol>
+        <ttcol>Group-Type</ttcol>
         <ttcol>Reference</ttcol>
 
         <c>256</c>
         <c>ffdhe2432</c>
         <c>Y</c>
+        <c>FF</c>
         <c>[this document]</c>
 
         <c>257</c>
         <c>ffdhe3072</c>
         <c>Y</c>
+        <c>FF</c>
         <c>[this document]</c>
 
         <c>258</c>
         <c>ffdhe4096</c>
         <c>Y</c>
+        <c>FF</c>
         <c>[this document]</c>
 
         <c>259</c>
         <c>ffdhe6144</c>
         <c>Y</c>
+        <c>FF</c>
         <c>[this document]</c>
 
         <c>260</c>
         <c>ffdhe8192</c>
         <c>Y</c>
+        <c>FF</c>
         <c>[this document]</c>
       </texttable> 
 
