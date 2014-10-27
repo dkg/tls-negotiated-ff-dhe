@@ -953,10 +953,15 @@ cryptographic levels?)
 ]]></artwork>
       </figure>
       <t>
-        New additions to this registry may use this same derivation
-        (e.g. with different bitlengths) or may choose their
-        parameters in a different way, but must be clear about how the
-        parameters were derived.
+        New additions of FFDHE groups to this registry may use this
+        same derivation (e.g. with different bitlengths) or may choose
+        their parameters in a different way, but must be clear about
+        how the parameters were derived.
+      </t>
+      <t>
+        New additions of FFDHE groups MUST use a safe prime as the
+        modulus to enable the inexpensive peer verification described
+        in <xref target="peercheck"/>.
       </t>
       <section anchor="ffdhe2432" title="ffdhe2432">
         <t>The 2432-bit group has registry value 256, and is calcluated
