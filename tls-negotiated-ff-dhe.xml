@@ -357,9 +357,10 @@
           secret exponents that should preserve it.  For example,
           rather than doing 2*2*2432 multiplications for a ffdhe2432
           handshake, each peer can choose to do 2*2*224
-          multiplications by choosing their secret exponent in the
-          range [2,2^224] and still keep the approximate 112-bit
-          security level.
+          multiplications by choosing their secret exponent from the
+          range [2^223,2^224] (that is, a m-bit integer where m is at
+          least 224) and still keep the approximate 112-bit security
+          level.
         </t>
         <t>
           A similar short-exponent approach is suggested in SSH's
@@ -502,10 +503,11 @@ cryptographic levels?)
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>
         Thanks to Fedor Brunner, Dave Fergemann, Sandy Harris, Watson
-        Ladd, Nikos Mavrogiannopolous, Niels M&#246;ller, Kenny
-        Paterson, Eric Rescorla, Tom Ritter, Martin Thomson, and Sean
-        Turner for their comments and suggestions on this draft.  Any
-        mistakes here are not theirs.
+        Ladd, Nikos Mavrogiannopolous, Niels M&#246;ller, Bodo
+        Moeller, Kenny Paterson, Eric Rescorla, Tom Ritter, Rene
+        Struik, Martin Thomson, Sean Turner, and other members of the
+        TLS Working Group for their comments and suggestions on this
+        draft.  Any mistakes here are not theirs.
       </t>
     </section>
 
