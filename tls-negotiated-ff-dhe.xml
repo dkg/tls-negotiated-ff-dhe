@@ -206,7 +206,11 @@
       preference, but see <xref target="preference_ordering"/> for
       more nuance.</t>
 
-      <t>Here are the new code points for the NamedCurve registry:</t>
+      <t>Codepoints in the NamedCurve registry with a high byte of
+      0x01 (that is, between 256 and 511 inclusive) are set aside for
+      FFDHE groups, though only a small number of them are initially
+      defined and we do not expect many others to be added.  The new
+      code points for the NamedCurve registry are:</t>
 
       <figure>
         <artwork><![CDATA[
@@ -245,15 +249,25 @@
     </section>
     <section anchor="server" title="Server Behavior">
       <t>If a compatible TLS server receives a NamedCurves extension
-      from a client that includes any FFDHE groups, the server SHOULD
-      NOT select an FFDHE ciphersuite if it is unwilling to use one of
-      the FFDHE groups named by the client.  In this case, the server
-      SHOULD select an acceptable non-FFDHE ciphersuite from the
-      client's offered list.  If the extension is present, none of the
-      client's offered groups are acceptable by the server, and none
-      of the client's proposed non-FFDHE ciphersuites are acceptable
-      to the server, the server SHOULD end the connection with a fatal
-      TLS alert of type insufficient_security.
+      from a client that includes any FFDHE groups (i.e. codepoints
+      between 256 and 511 inclusive), the server SHOULD NOT select an
+      FFDHE ciphersuite if none of the client-proposed FFDHE groups
+      are acceptable to the server.  In this case, the server SHOULD
+      select an acceptable non-FFDHE ciphersuite from the client's
+      offered list.  If the extension is present with FFDHE groups,
+      none of the client's offered groups are acceptable by the
+      server, and none of the client's proposed non-FFDHE ciphersuites
+      are acceptable to the server, the server SHOULD end the
+      connection with a fatal TLS alert of type insufficient_security.
+      </t>
+      <t>
+      If at least one FFDHE ciphersuite is present in the client
+      ciphersuite list, and the NamedCurves extension is present in
+      the client hello, but the extension does not include any FFDHE
+      groups (i.e. no codepoints between 256 and 511 inclusive), then
+      the server knows that the client is not compatible with this
+      document.  In this scenario, a server MAY offer an FFDHE named
+      group to the client as part of a traditional ServerDHParams.
       </t>
       
       <t>A compatible TLS server that receives the NamedCurve
@@ -525,10 +539,11 @@ cryptographic levels?)
       <t>
         This document expands the semantics of this registry slightly,
         to include groups based on finite fields in addition to groups
-        based on elliptic curves.  It should add a column "Group-Type"
-        to the registry indicating whether a given group based on
-        elliptic curves ("EC") or finite fields ("FF").  All
-        pre-existing entries should have that column set to "EC".
+        based on elliptic curves.  It should add a range designation
+        to that registry, indicating that values from 256-511
+        (inclusive) are set aside for "Finite Field Diffie-Hellman
+        groups", and that all other entries in the registry are
+        "Elliptic curve groups".
       </t>
       <t>
         This document allocates five codepoints in the registry, as follows:
@@ -538,37 +553,31 @@ cryptographic levels?)
         <ttcol>Value</ttcol>
         <ttcol>Description</ttcol>
         <ttcol>DTLS-OK</ttcol>
-        <ttcol>Group-Type</ttcol>
         <ttcol>Reference</ttcol>
 
         <c>256</c>
         <c>ffdhe2432</c>
         <c>Y</c>
-        <c>FF</c>
         <c>[this document]</c>
 
         <c>257</c>
         <c>ffdhe3072</c>
         <c>Y</c>
-        <c>FF</c>
         <c>[this document]</c>
 
         <c>258</c>
         <c>ffdhe4096</c>
         <c>Y</c>
-        <c>FF</c>
         <c>[this document]</c>
 
         <c>259</c>
         <c>ffdhe6144</c>
         <c>Y</c>
-        <c>FF</c>
         <c>[this document]</c>
 
         <c>260</c>
         <c>ffdhe8192</c>
         <c>Y</c>
-        <c>FF</c>
         <c>[this document]</c>
       </texttable> 
 
