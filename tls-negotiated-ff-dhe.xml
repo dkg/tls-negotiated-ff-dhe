@@ -383,7 +383,7 @@
       <section anchor="preference_ordering" title="Preference Ordering">
         <t>The ordering of named groups in the NamedCurves extension
         may contain some ECDHE groups and some FFDHE groups.  These
-        SHOULD be ranked in preference order.
+        SHOULD be ranked in the order preferred by the client.
         </t>
         <t>However, the ClientHello also contains list of desired
         ciphersuites, also ranked in preference order.  This presents
@@ -393,21 +393,23 @@
         TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA&gt; and the NamedCurves
         Extension contains two choices in order
         &lt;secp256r1,ffdhe3072&gt; then there is a clear
-        contradiction.  Clients MUST NOT present such a contradiction.
+        contradiction.  Clients SHOULD NOT present such a
+        contradiction since it does not represent a sensible ordering.
         A server that encounters such an contradiction when selecting
         between an ECDHE or FFDHE key exchange mechanism while trying
         to respect client preferences SHOULD give priority to the
         NamedCurves extension (in the example case, it should select
-        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA with secp256r1.
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA with secp256r1), but MAY
+        resolve the contradiction any way it sees fit.
         </t>
-        <t>More subtly, it is possible for a client to present an
-        ambiguity that is not a clear contradiction.  For example, the
-        ClientHello could be the same as the above example, but
-        NamedCurves could be:
-        &lt;ffdhe8192,secp384p1,ffdhe3072,secp256r1&gt;.  Clients MAY
-        present such a mixed set of groups. In this case, a server
-        configured to respect client preferences and with support for
-        all listed groups SHOULD select
+        <t>More subtly, clients MAY interleave preferences between
+        ECDHE and FFDHE groups, for example if stronger groups are
+        preferred regardless of cost, but weaker groups are
+        acceptable, the NamedCurves extension could consist of:
+        &lt;ffdhe8192,secp384p1,ffdhe3072,secp256r1&gt;.  In this
+        example, with the same CipherSuite offered as the previous
+        example, a server configured to respect client preferences and
+        with support for all listed groups SHOULD select
         TLS_DHE_RSA_WITH_AES_128_CBC_SHA with ffdhe8192.  A server
         configured to respect client preferences and with support for
         only secp384p1 and ffdhe3072 SHOULD select
