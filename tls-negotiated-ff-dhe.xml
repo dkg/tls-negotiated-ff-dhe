@@ -267,19 +267,19 @@
       groups (i.e. no codepoints between 256 and 511 inclusive), then
       the server knows that the client is not compatible with this
       document.  In this scenario, a server MAY offer an FFDHE named
-      group to the client as part of a traditional ServerDHParams.
+      group to the client as part of a traditional ServerKeyExchange.
       </t>
       
       <t>A compatible TLS server that receives the NamedCurve
       extension with FFDHE codepoints in it, and which selects an
       FFDHE ciphersuite MUST select one of the offered groups and
-      indicates the choice of groups to the client by sending a
-      specially-formatted ServerDHParams as described below.
+      indicates the choice of group to the client by sending a
+      specially-formatted FFDHEKeyExchange instead of
+      ServerKeyExchange as described below.
       </t>
 
-      <t>A TLS server MUST NOT send the specially-formatted
-      ServerDHParams message to a client that did not offer an FFDHE
-      group in the NamedCurves extension first.
+      <t>A TLS server MUST NOT send FFDHEKeyExchange to a client that
+      did not offer an FFDHE group in the NamedCurves extension first.
       </t>
 
       <t>A TLS server MUST NOT select a named group that was not
@@ -301,37 +301,76 @@
         ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
-      <section anchor="ServerDHParams" title="ServerDHParams changes">
+      <section anchor="FFDHEKeyExchange" title="FFDHEKeyExchange">
         <t>
           When the compatible server selects an FFDHE ciphersuite for
           a client who offered FFDHE groups via Named Curves, the
-          ServerDHParams member of the subsequent ServerKeyExchange
-          message should indicate a one-byte zero value (0) in place
-          of dh_g to indicate support for a pre-known FFDHE group.  It
-          places the value of the named group (represented as a
-          two-byte value) in place of dh_p.  dh_Ys must be transmitted
-          as normal.
+          server sends an FFDHEKeyExchange message instead of a
+          ServerKeyExchange message.  This message has a handshake
+          type of ffdhe_key_exchange (TBD1), with the following
+          structure:
         </t>
 
+          <figure>
+        <artwork><![CDATA[
+      enum { ffdhe_key_exchange (TBD1) } HandshakeType;
+
+      struct {
+          HandshakeType msg_type;    /* handshake type */
+          uint24 length;             /* bytes in message */
+          select (HandshakeType) {
+              /* other types... */
+              case ffdhe_key_exchange:    FFDHEKeyExchange;
+          } body;
+      } Handshake;
+
+
+      struct {
+          NamedCurve ffdhe_group;
+          opaque dh_Ys<1..2^16-1>;
+          digitally-signed struct {
+              opaque label[5];
+              opaque client_random[32];
+              opaque server_random[32];
+              NamedCurve ffdhe_group;
+              opaque dh_Ys<1..2^16-1>;
+          } signed_params;
+      } FFDHEKeyExchange;
+
+      label
+         The fixed string "ffdhe"
+      
+      dh_Ys
+         The server's Diffie-Hellman public value (g^X mod p).
+
+      signed_params
+         a signature over the the server's parameters as
+         specified below.
+          ]]></artwork>
+      </figure>
+
+      <t>
+        Note that the signed_params of the FFDHEKeyExchange is formed
+        under the same mechanisms and constraints as the signed_params
+        of a traditional ServerKeyExchange when using an FFDHE
+        ciphersuite (see Section 7.4.3 of <xref target="RFC5246"/>).
+      </t>
+      
         <t>
-          This re-purposing of dh_p and dh_g is unambiguous: there are
-          no groups with a generator of 0, and no implementation
-          should accept a modulus of size &lt; 17 bits.  Aside from
-          making the ServerDHParams an unambiguous indicator of
-          support for named FFDHE groups, this change serves two
-          purposes:
+          This replacement of the ServerKeyExchange is intended to meet two goals:
           <list>
             <t>
               The size of the handshake is reduced (significantly, in
               the case of a large prime modulus).
             </t>
             <t>
-              The signed struct should not be re-playable in a subsequent
-              key exchange that does not indicate named FFDHE groups.
+              The introduction of the fixed label should make it so
+              that this signature should not be re-playable in a
+              subsequent key exchange that does not indicate named
+              FFDHE groups.
             </t>
           </list>
         </t>
-
       </section>
     </section>
     <section anchor="optimizations" title="Optimizations">
@@ -531,6 +570,12 @@ cryptographic levels?)
 
     <section anchor="IANA" title="IANA Considerations">
       <t>
+        IANA maintains the registry for TLS HandshakeType.  It should
+        allocate a new value in that registry (TBD1) for
+        FFDHEKeyExchange.
+      </t>
+      
+      <t>
         IANA maintains the registry currently known as EC Named Curves
         (originally defined in <xref target="RFC4492"/> and updated by
         <xref target="RFC7027"/>) at <eref
@@ -631,10 +676,11 @@ cryptographic levels?)
             </t>
             <t>
               Pretend that a non-compatible client is compatible.
-              This could cause the server to send what appears to be
-              an extremely odd ServerDHParams (see <xref target="ServerDHParams"/>),
-              and the check in the Finished message would fail. It is
-              not clear how this could be an attack.
+              This could cause the server to send an FFDHEKeyExchange
+              instead of a ServerKeyExchange (see <xref
+              target="FFDHEKeyExchange"/>), which would not be
+              validatable by the client. It is not clear how this
+              could be an attack.
             </t>
             <t>
               Change the list of groups offered by the client (e.g. by
