@@ -448,36 +448,6 @@
       before any formalization of this draft]
       </t>
 
-      <section title="Server Indication of support">
-        <t>Some servers will support this mechanism, but for whatever
-        reason decide to not negotiate a ciphersuite with DHE key
-        exchange at all.  Some possible reasons include:
-        <list>
-          <t>The client indicated that a server-supported non-FFDHE
-          ciphersuite was preferred over all FFDHE ciphersuites, and
-          the server honors that preference.</t>
-          <t>The server prefers a client-supported non-FFDHE
-          ciphersuite over all FFDHE ciphersuites, and selects it
-          unilaterally.</t>
-          <t>The server would have chosen a FFDHE ciphersuite, but
-          none of the client's offered groups are acceptable to the
-          server,</t>
-        </list>
-
-        Clients will not know that such a server supports this
-        mechanism.</t>
-
-        <t>Should we offer a way for a server to indicate its support
-        for this mechanism to a compatible client in this case?</t>
-        
-        <t>Should the server have a way to advertise that it supports
-        this mechanism even if the client does not offer an FFDHE
-        group in Supported Groups, or does not offer any Supported
-        Group at all?</t>
-
-        <t>[dkg] I think the answer here is that we do not care about
-        signalling this support to the client in general.</t>
-      </section>
       <section title="Normalizing Weak Groups">
         <t>Is there any reason to include a weak group in the list of
         groups?  Most DHE-capable peers can already handle 1024-bit
