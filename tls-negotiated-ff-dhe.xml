@@ -594,6 +594,12 @@
         extremely long-term confidentiality should prefer stronger
         groups.
         </t>
+        <t><xref target="ENISA"/> provides rough estimates of group
+        resistance to attack, an recommends that forward-looking
+        implementations ("future systems") should use FFDHE group
+        sizes of at least 3072 bits.  ffdhe3072 is intended for use in
+        these implementations.
+        </t>
       </section>
       <section title="DHE only">
         <t>
