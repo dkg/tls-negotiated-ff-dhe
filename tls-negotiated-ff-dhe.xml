@@ -120,11 +120,11 @@
       Diffie-Hellman ephemeral (DHE) key exchange mode which provides
       Forward Secrecy for the connection.  The client offers a
       ciphersuite in the ClientHello that includes DHE, and the server
-      offers the client group parameters g and p.  If the client does
+      offers the client group parameters generator g and modulus p.  If the client does
       not consider the group strong enough (e.g. if p is too small, or
       if p is not prime, or there are small subgroups), or if it is
-      unable to process it for other reasons, it has no recourse but
-      to terminate the connection.</t>
+      unable to process the group for other reasons, the client has no
+      recourse but to terminate the connection.</t>
 
       <t>Conversely, when a TLS server receives a suggestion for a DHE
       ciphersuite from a client, it has no way of knowing what kinds
@@ -285,7 +285,7 @@
     <section anchor="server" title="Server Behavior">
       <t>If a compatible TLS server receives a Supported Groups
       extension from a client that includes any FFDHE group (i.e. any
-      codepoint between 256 and 511 inclusive), and if none of the
+      codepoint between 256 and 511 inclusive, even if unknown to the server), and if none of the
       client-proposed FFDHE groups are known and acceptable to the
       server, then the server SHOULD NOT select an FFDHE ciphersuite.
       In this case, the server SHOULD select an acceptable non-FFDHE
@@ -595,15 +595,15 @@
         groups.
         </t>
         <t><xref target="ENISA"/> provides rough estimates of group
-        resistance to attack, an recommends that forward-looking
+        resistance to attack, and recommends that forward-looking
         implementations ("future systems") should use FFDHE group
         sizes of at least 3072 bits.  ffdhe3072 is intended for use in
         these implementations.
         </t>
       </section>
-      <section title="DHE only">
+      <section title="Finite-Field DHE only">
         <t>
-          Note that this extension specifically targets only finite
+          Note that this document specifically targets only finite
           field-based Diffie-Hellman ephemeral key exchange
           mechanisms.  It does not cover the non-ephemeral DH key
           exchange mechanisms, nor does it address elliptic curve DHE
@@ -611,7 +611,7 @@
           target="RFC4492"/>.
         </t>
         <t>
-          Measured by cost to the TLS peers, ECDHE appears today to
+          Measured by computational cost to the TLS peers, ECDHE appears today to
           offer much a stronger key exchange than FFDHE.
         </t>
       </section>
@@ -625,7 +625,7 @@
           the TLS session).
         </t>
         <t>
-          Revisions of this extension or updates should mark
+          Revisions of this document should mark
           known-weak groups as explicitly deprecated for use in TLS,
           and should update the estimated work factor needed to break
           the group, if the cryptanalysis has changed.
@@ -714,7 +714,7 @@
         Diffie-Hellman group; using a very strong symmetric cipher
         like AES256 with a forward-secret ciphersuite, but generating
         the keys with a much weaker group like dhe2432 simply moves
-        the cost to an attacker from attacking the symmetric cipher to
+        the adversary's cost from attacking the symmetric cipher to
         attacking the dh_Ys or dh_Yc ephemeral keyshares.
         </t>
         <t>If the goal is to provide forward secrecy, attention should
