@@ -130,7 +130,7 @@
       ciphersuite from a client, it has no way of knowing what kinds
       of DH groups the client is capable of handling, or what the
       client's security requirements are for this key exchange
-      session.  Some widely-distributed TLS clients are not capable of
+      session.  For example, some widely-distributed TLS clients are not capable of
       DH groups where p > 1024 bits.  Other TLS clients may by policy wish
       to use DHE only if the server can offer a stronger group (and
       are willing to use a non-PFS key-exchange mechanism otherwise).
@@ -147,11 +147,11 @@
       <t>This modification to TLS solves these problems by using a
       section of the "EC Named Curves" registry to select common DH
       groups with known structure; defining the use of the
-      "elliptic_curves(10)" extension for clients advertising support
-      for DHE with these groups; and defining how a server indicates
-      acceptance of a proposed common group.  This document also
-      provides guidance for compliant peers to take advantage of the
-      additional security, availability, and efficiency offered.</t>
+      "elliptic_curves(10)" extension (described here as "Supported
+      Groups" extension) for clients advertising support for DHE with
+      these groups.  This document also provides guidance for
+      compliant peers to take advantage of the additional security,
+      availability, and efficiency offered.</t>
 
       <t>The use of this mechanism by one compliant peer when
       interacting with a non-compliant peer should have no detrimental
@@ -181,36 +181,22 @@
       </section>
     </section>
 
-    <section anchor="client" title="Client Behavior">
-      <t>A TLS client that is capable of using strong finite field
-      Diffie-Hellman groups can advertise its capabilities and its
-      preferences for stronger key exchange by using this
-      mechanism.</t>
-
+      <section anchor="named_group_overview" title="Named Group Overview">
       <t>We use previously-unallocated codepoints within the extension
       currently known as "elliptic_curves" (section 5.1.1. of <xref
       target="RFC4492"/>) to indicate known finite field groups.  The
-      extension's semantics is expanded from "known elliptic curve
-      groups" to "known groups".  The semantics of the extension's
+      extension's semantics are expanded from "Supported Elliptic
+      Curves" to "Supported Groups".  The semantics of the extension's
       data type (enum NamedCurve) is also expanded from "named curve"
       to "named group".</t>
-
-      <t>The compatible client that wants to be able to negotiate
-      strong FFDHE SHOULD send an extension of type "elliptic_curves"
-      (<xref target="RFC4492"/>) in the ClientHello, and include a
-      list of known FFDHE groups in the extension data, ordered from
-      most preferred to least preferred.  If the client also supports
-      and wants to offer ECDHE key exchange, it MUST use a single
-      elliptic_curves extension to include all supported groups (both
-      ECDHE and FFDHE groups).  The ordering SHOULD be based on client
-      preference, but see <xref target="preference_ordering"/> for
-      more nuance.</t>
 
       <t>Codepoints in the NamedCurve registry with a high byte of
       0x01 (that is, between 256 and 511 inclusive) are set aside for
       FFDHE groups, though only a small number of them are initially
-      defined and we do not expect many others to be added.  The new
-      code points for the NamedCurve registry are:</t>
+      defined and we do not expect many other FFDHE groups to be added
+      to this range.  No codepoints outside of this range will be
+      allocated to FFDHE groups.  The new code points for the
+      NamedCurve registry are:</t>
 
       <figure>
         <artwork><![CDATA[
@@ -222,10 +208,6 @@
         } NamedCurve;
             ]]></artwork>
       </figure>
-
-      <t>A client that offers any of these values in the NamedCurves
-      extension SHOULD ALSO include at least one FFDHE ciphersuite in
-      the Client Hello.</t>
 
       <t>These additions to the Named Curve registry are described in
       detail in <xref target="named_group_registry"/>.  They are all
@@ -243,47 +225,105 @@
         this value. See <xref target="choice_of_groups"/> for reasons
         that this draft does not reuse pi.
       </t>
+      </section>
+    
+    <section anchor="client" title="Client Behavior">
+      <t>A TLS client that is capable of using strong finite field
+      Diffie-Hellman groups can advertise its capabilities and its
+      preferences for stronger key exchange by using this
+      mechanism.</t>
+
+      <t>The compatible client that wants to be able to negotiate
+      strong FFDHE SHOULD send a "Supported Groups" extension 
+      (identified by type elliptic_curves(10) in <xref target="RFC4492"/>) in the
+      ClientHello, and include a list of known FFDHE groups in the
+      extension data, ordered from most preferred to least preferred.
+      If the client also supports and wants to offer ECDHE key
+      exchange, it MUST use a single "Supported Groups" extension to
+      include all supported groups (both ECDHE and FFDHE groups).  The
+      ordering SHOULD be based on client preference, but see <xref
+      target="preference_ordering"/> for more nuance.</t>
+
+      <t>A client that offers any of these values in the elliptic_curves
+      extension SHOULD ALSO include at least one FFDHE ciphersuite in
+      the Client Hello.</t>
 
       <t>A client who offers a group MUST be able and willing to
       perform a DH key exchange using that group.</t>
+
+      <t>A client that offers one or more FFDHE groups in the
+      "Supported Groups" extension and an FFDHE ciphersuite, and
+      receives an FFDHE ciphersuite from the server SHOULD take the
+      following steps upon receiving the ServerKeyExchange:
+              <list>
+                <t>For non-anonymous ciphersuites where the offered
+                Certificate is valid and appropriate for the peer,
+                validate the signature over the ServerDHParams.  If
+                not valid, terminate the connection.</t>
+                <t>If the signature over ServerDHParams is valid,
+                compare the selected dh_p and dh_g with the FFDHE
+                groups offered by the client.  If none of the offered
+                groups match, the server is not compatible with this
+                draft.  The client MAY decide to continue the
+                connection if the selected group is acceptable under
+                local policy, or it MAY decide to terminate the
+                connection with a fatal insufficient_security(71)
+                alert.</t>
+                <t>If the selected group matches an offered FFDHE
+                group exactly, the the client MUST verify that dh_Ys
+                is in the range 1 &lt; dh_Ys &lt; dh_p - 1. If dh_Ys
+                is not in this range, the client MUST terminate the
+                connection with a fatal handshake_failure(40) alert.
+                </t>
+                <t>If the selected group matches an offered FFDHE
+                group exactly, and dh_Ys is in range, then the client
+                SHOULD continue with the connection as usual.
+                </t>
+              </list>
+      </t>
     </section>
     <section anchor="server" title="Server Behavior">
-      <t>If a compatible TLS server receives a NamedCurves extension
-      from a client that includes any FFDHE groups (i.e. codepoints
-      between 256 and 511 inclusive), the server SHOULD NOT select an
-      FFDHE ciphersuite if none of the client-proposed FFDHE groups
-      are acceptable to the server.  In this case, the server SHOULD
-      select an acceptable non-FFDHE ciphersuite from the client's
-      offered list.  If the extension is present with FFDHE groups,
-      none of the client's offered groups are acceptable by the
-      server, and none of the client's proposed non-FFDHE ciphersuites
-      are acceptable to the server, the server SHOULD end the
-      connection with a fatal TLS alert of type insufficient_security.
+      <t>If a compatible TLS server receives a Supported Groups
+      extension from a client that includes any FFDHE group (i.e. any
+      codepoint between 256 and 511 inclusive), and if none of the
+      client-proposed FFDHE groups are known and acceptable to the
+      server, then the server SHOULD NOT select an FFDHE ciphersuite.
+      In this case, the server SHOULD select an acceptable non-FFDHE
+      ciphersuite from the client's offered list.  If the extension is
+      present with FFDHE groups, none of the client's offered groups
+      are acceptable by the server, and none of the client's proposed
+      non-FFDHE ciphersuites are acceptable to the server, the server
+      SHOULD end the connection with a fatal TLS alert of type
+      insufficient_security(71).
       </t>
       <t>
       If at least one FFDHE ciphersuite is present in the client
-      ciphersuite list, and the NamedCurves extension is present in
-      the client hello, but the extension does not include any FFDHE
+      ciphersuite list, and the Supported Groups extension is present
+      in the ClientHello, but the extension does not include any FFDHE
       groups (i.e. no codepoints between 256 and 511 inclusive), then
       the server knows that the client is not compatible with this
-      document.  In this scenario, a server MAY offer an FFDHE named
-      group to the client as part of a traditional ServerKeyExchange.
+      document.  In this scenario, a server MAY choose to select a
+      non-FFDHE ciphersuite, or MAY choose an FFDHE ciphersuite and
+      offer an FFDHE group of its choice to the client as part
+      of a traditional ServerKeyExchange.
       </t>
       
-      <t>A compatible TLS server that receives the NamedCurve
+      <t>A compatible TLS server that receives the Supported Groups
       extension with FFDHE codepoints in it, and which selects an
-      FFDHE ciphersuite MUST select one of the offered groups and
-      indicates the choice of group to the client by sending the
-      group's parameters exactly as expected in the ServerKeyExchange.
+      FFDHE ciphersuite MUST select one of the client's offered
+      groups.  The server indicates the choice of group to the client
+      by sending the group's parameters as usual in the
+      ServerKeyExchange as described in section 7.4.3 of <xref
+      target="RFC5246"/>.
       </t>
 
-      <t>A TLS server MUST NOT select a named group that was not
+      <t>A TLS server MUST NOT select a named FFDHE group that was not
       offered by a compatible client.
       </t>
 
       <t>A TLS server MUST NOT select an FFDHE ciphersuite if the
       client did not offer one, even if the client offered an FFDHE
-      group in the NamedCurves extension.
+      group in the Supported Groups extension.
       </t>
 
       <t>
@@ -296,6 +336,13 @@
         ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
+      <t>When a compatible server selects an FFDHE group from among a
+      client's Supported Groups, and the client sends a
+      ClientKeyExchange, the server MUST verify that 1 &lt; dh_Yc &lt;
+      dh_p - 1.  If it is out of range, the server MUST terminate the
+      connection with fatal handshake_failure(40) alert.
+      </t>
+
     </section>
     <section anchor="optimizations" title="Optimizations">
       <t>In a key exchange with a successfully negotiated known FFDHE
@@ -306,7 +353,7 @@
       </t>
       <section anchor="peercheck" title="Checking the Peer's Public Key">
         <t>Peers MUST validate each other's public key Y
-        (dh_Ys offered by the server or DH_Yc offered by the client) by
+        (dh_Ys offered by the server or dh_Yc offered by the client) by
         ensuring that 1 &lt; Y &lt; p-1.  This simple check ensures that
         the remote peer is properly behaved and isn't forcing the local
         system into a small subgroup.</t>
@@ -351,14 +398,15 @@
           also pre-compute a table of powers of the generator of a
           known group.  This is a memory vs. time tradeoff, and it
           only accelerates the first exponentiation of the ephemeral
-          DH exchange (the exponentiation using the peer's public
-          exponent as a base still needs to be done as normal).
+          DH exchange (the fixed-base exponentiation).  The
+          variable-base exponentiation (using the peer's public
+          exponent as a base) still needs to be calculated as normal.
         </t>
       </section>
     </section>
     <section anchor="operational_considerations" title="Operational Considerations">
       <section anchor="preference_ordering" title="Preference Ordering">
-        <t>The ordering of named groups in the NamedCurves extension
+        <t>The ordering of named groups in the Supported Groups extension
         may contain some ECDHE groups and some FFDHE groups.  These
         SHOULD be ranked in the order preferred by the client.
         </t>
@@ -367,7 +415,7 @@
         the possibility of conflicted preferences.  For example, if
         the ClientHello contains a CipherSuite with two choices in
         order &lt;TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
-        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA&gt; and the NamedCurves
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA&gt; and the Supported Groups
         Extension contains two choices in order
         &lt;secp256r1,ffdhe3072&gt; then there is a clear
         contradiction.  Clients SHOULD NOT present such a
@@ -375,14 +423,14 @@
         A server that encounters such an contradiction when selecting
         between an ECDHE or FFDHE key exchange mechanism while trying
         to respect client preferences SHOULD give priority to the
-        NamedCurves extension (in the example case, it should select
+        Supported Groups extension (in the example case, it should select
         TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA with secp256r1), but MAY
         resolve the contradiction any way it sees fit.
         </t>
         <t>More subtly, clients MAY interleave preferences between
         ECDHE and FFDHE groups, for example if stronger groups are
         preferred regardless of cost, but weaker groups are
-        acceptable, the NamedCurves extension could consist of:
+        acceptable, the Supported Groups extension could consist of:
         &lt;ffdhe8192,secp384p1,ffdhe3072,secp256r1&gt;.  In this
         example, with the same CipherSuite offered as the previous
         example, a server configured to respect client preferences and
@@ -424,8 +472,8 @@
         
         <t>Should the server have a way to advertise that it supports
         this mechanism even if the client does not offer an FFDHE
-        group in NamedCurves, or does not offer any NamedCurve at
-        all?</t>
+        group in Supported Groups, or does not offer any Supported
+        Group at all?</t>
 
         <t>[dkg] I think the answer here is that we do not care about
         signalling this support to the client in general.</t>
@@ -438,32 +486,6 @@
         roughly equivalent to 112-bit security.  And future
         implementations should use sizes of at least 3072 bits
         according to <xref target="ENISA"/>.
-        </t>
-      </section>
-      <section title="Arbitrary Groups">
-        <t>
-          This spec currently doesn't indicate any support for groups
-          other than the named groups.  Other FFDHE specifications
-          have moved away from staticly-named groups with the
-          explicitly-stated rationale of reducing the incentive for
-          precomputation-driven attacks on any specific group
-          (e.g. section 1 of <xref target="RFC4419"/>).  However,
-          arbitrary large groups are expensive to transmit over the
-          network and it is computationally infeasible for the client
-          to verify their structure during a key exchange.  If we
-          instead allow the server to propose arbitrary groups, we
-          could make it a MUST that the generated groups use safe
-          prime moduli, while still allowing clients to signal support
-          (and desire) for large groups.  This leaves the client in
-          the position of relying on the server to choose a strong
-          modulus, though.
-        </t>
-        <t>
-          Note that in several known attacks against TLS and SSL <xref
-          target="SECURE-RESUMPTION"/> <xref target="CROSS-PROTOCOL"/>
-          <xref target="SSL3-ANALYSIS"/>, a malicious server uses a
-          deliberately broken FFDHE group to impersonate the client to
-          a different server.
         </t>
       </section>
     </section>
@@ -549,7 +571,7 @@ cryptographic levels?)
     <section anchor="Security" title="Security Considerations">
       <section title="Negotiation resistance to active attacks">
         <t>
-          Because the contents of the NamedCurves extension is hashed
+          Because the contents of the Supported Groups extension is hashed
           in the finished message, an active MITM that tries to filter
           or omit groups will cause the handshake to fail, but
           possibly not before getting the peer to do something they
@@ -588,8 +610,8 @@ cryptographic levels?)
           <list>
             <t>
               Pretend that a compatible client is not compatible
-              (e.g. by not offering the NamedCurves extension, or by
-              replacing the NamedCurves extension with one that
+              (e.g. by not offering the Supported Groups extension, or by
+              replacing the Supported Groups extension with one that
               includes no FFDHE groups).  This could cause the server
               to negotiate a weaker DHE group during the handshake, or
               to select a non-FFDHE ciphersuite, but it would fail to
@@ -612,13 +634,32 @@ cryptographic levels?)
           </list>
         </t>
       </section>
+      <section title="Group strength considerations">
+        <t>TLS implementations using FFDHE key exchange should
+        consider the strength of the group they negotiate.  The
+        strength of the selected group is one of the factors which
+        defines the connection's resiliance against attacks on the
+        session's confidentiality and integrity, since the session
+        keys are derived from the DHE handshake.
+        </t>
+        <t>While attacks on integrity must generally happen while the
+        session is in progress, attacks against session
+        confidentiality can happen significantly later, if the entire
+        TLS session is stored for offline analysis.  Therefore, FFDHE
+        groups should be selected by clients and servers based on
+        confidentiality guarantees they need.  Sessions which need
+        extremely long-term confidentiality should prefer stronger
+        groups.
+        </t>
+      </section>
       <section title="DHE only">
         <t>
           Note that this extension specifically targets only finite
-          field-based Diffie-Hellman ephemeral key exchange mechanisms.
-          It does not cover the non-ephemeral DH key exchange
-          mechanisms, nor does it cover elliptic curve-based DHE key
-          exchange, which has its own list of named groups.
+          field-based Diffie-Hellman ephemeral key exchange
+          mechanisms.  It does not cover the non-ephemeral DH key
+          exchange mechanisms, nor does it address elliptic curve DHE
+          (ECDHE) key exchange, which is defined in <xref
+          target="RFC4492"/>.
         </t>
       </section>
       <section title="Deprecating weak groups">
@@ -626,7 +667,7 @@ cryptographic levels?)
           Advances in hardware or in finite field cryptanalysis may
           cause some of the negotiated groups to not provide the
           desired security margins, as indicated by the estimated work
-          factor of an adversary to discover the premaster secret (and
+          factor of an adversary to discover the premaster secret (and may
           therefore compromise the confidentiality and integrity of
           the TLS session).
         </t>
@@ -664,12 +705,6 @@ cryptographic levels?)
               services shouldn't share keys; however, using different
               groups avoids these failure modes entirely.
             </t>
-            <t>
-              Other lists of named FF DHE groups are not collected in
-              a single IANA registry, or are mixed with non-FF DHE
-              groups, which makes them inconvenient for re-use in a
-              TLS DHE key exchange context.
-            </t>
           </list>
         </t>
       </section>
@@ -686,21 +721,22 @@ cryptographic levels?)
       </section>
       <section title="Replay attacks from non-negotiated FF DHE">
         <t>
-          <xref target="SECURE-RESUMPTION" /> shows a malicious
-          peer using a bad FF DHE group to maneuver a client into
-          selecting a pre-master secret of the peer's choice, which
-          can be replayed to another server using a non-DHE key
-          exchange, and can then be bootstrapped to replay client
-          authentication.
+          <xref target="SECURE-RESUMPTION" />, <xref
+          target="CROSS-PROTOCOL"/>, and <xref
+          target="SSL3-ANALYSIS"/> all show a malicious peer using a
+          bad FFDHE group to maneuver a client into selecting a
+          pre-master secret of the peer's choice, which can be
+          replayed to another server using a non-DHE key exchange, and
+          can then be bootstrapped to replay client authentication.
         </t>
         <t>
           To prevent this attack (barring the fixes proposed in <xref
-          target="SESSION-HASH"/>), a client would need not only to implement this
-          draft, but also to reject non-negotiated FF DHE ciphersuites
-          whose group structure it cannot afford to verify.  Such a
-          client would need to abort the initial handshake and
-          reconnect to the server in question without listing any FF
-          DHE ciphersuites on the subsequent connection.
+          target="SESSION-HASH"/>), a client would need not only to
+          implement this draft, but also to reject non-negotiated
+          FFDHE ciphersuites whose group structure it cannot afford to
+          verify.  Such a client would need to abort the initial
+          handshake and reconnect to the server in question without
+          listing any FFDHE ciphersuites on the subsequent connection.
         </t>
         <t>
           This tradeoff may be too costly for most TLS clients today,
