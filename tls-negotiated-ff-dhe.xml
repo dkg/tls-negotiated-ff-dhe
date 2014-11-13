@@ -443,22 +443,6 @@
       </section>
       
     </section>
-    <section anchor="questions" title="Open Questions">
-      <t>[This section should be removed, and questions resolved,
-      before any formalization of this draft]
-      </t>
-
-      <section title="Normalizing Weak Groups">
-        <t>Is there any reason to include a weak group in the list of
-        groups?  Most DHE-capable peers can already handle 1024-bit
-        DHE, and therefore 1024-bit DHE does not need to be
-        negotiated.  Properly-chosen 2432-bit DH groups should be
-        roughly equivalent to 112-bit security.  And future
-        implementations should use sizes of at least 3072 bits
-        according to <xref target="ENISA"/>.
-        </t>
-      </section>
-    </section>
 
 <!--
 
