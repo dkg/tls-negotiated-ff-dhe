@@ -131,7 +131,7 @@
       of DH groups the client is capable of handling, or what the
       client's security requirements are for this key exchange
       session.  Some widely-distributed TLS clients are not capable of
-      DH groups where p > 1024.  Other TLS clients may by policy wish
+      DH groups where p > 1024 bits.  Other TLS clients may by policy wish
       to use DHE only if the server can offer a stronger group (and
       are willing to use a non-PFS key-exchange mechanism otherwise).
       The server has no way of knowing which type of client is
@@ -140,7 +140,7 @@
 
       <t>Additionally, the DH parameters chosen by the server may have
       a known structure which renders them secure against a small
-      subgroup attack, but a client receiving an arbitrary p has no
+      subgroup attack, but a client receiving an arbitrary p and g has no
       efficient way to verify that the structure of a new group is
       reasonable for use.</t>
 
@@ -273,17 +273,12 @@
       <t>A compatible TLS server that receives the NamedCurve
       extension with FFDHE codepoints in it, and which selects an
       FFDHE ciphersuite MUST select one of the offered groups and
-      indicates the choice of group to the client by sending a
-      specially-formatted FFDHEKeyExchange instead of
-      ServerKeyExchange as described below.
-      </t>
-
-      <t>A TLS server MUST NOT send FFDHEKeyExchange to a client that
-      did not offer an FFDHE group in the NamedCurves extension first.
+      indicates the choice of group to the client by sending the
+      group's parameters exactly as expected in the ServerKeyExchange.
       </t>
 
       <t>A TLS server MUST NOT select a named group that was not
-      offered by the client.
+      offered by a compatible client.
       </t>
 
       <t>A TLS server MUST NOT select an FFDHE ciphersuite if the
@@ -301,77 +296,6 @@
         ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
-      <section anchor="FFDHEKeyExchange" title="FFDHEKeyExchange">
-        <t>
-          When the compatible server selects an FFDHE ciphersuite for
-          a client who offered FFDHE groups via Named Curves, the
-          server sends an FFDHEKeyExchange message instead of a
-          ServerKeyExchange message.  This message has a handshake
-          type of ffdhe_key_exchange (TBD1), with the following
-          structure:
-        </t>
-
-          <figure>
-        <artwork><![CDATA[
-      enum { ffdhe_key_exchange (TBD1) } HandshakeType;
-
-      struct {
-          HandshakeType msg_type;    /* handshake type */
-          uint24 length;             /* bytes in message */
-          select (HandshakeType) {
-              /* other types... */
-              case ffdhe_key_exchange:    FFDHEKeyExchange;
-          } body;
-      } Handshake;
-
-
-      struct {
-          NamedCurve ffdhe_group;
-          opaque dh_Ys<1..2^16-1>;
-          digitally-signed struct {
-              opaque label[5];
-              opaque client_random[32];
-              opaque server_random[32];
-              NamedCurve ffdhe_group;
-              opaque dh_Ys<1..2^16-1>;
-          } signed_params;
-      } FFDHEKeyExchange;
-
-      label
-         The fixed string "ffdhe"
-      
-      dh_Ys
-         The server's Diffie-Hellman public value (g^X mod p).
-
-      signed_params
-         a signature over the the server's parameters as
-         specified below.
-          ]]></artwork>
-      </figure>
-
-      <t>
-        Note that the signed_params of the FFDHEKeyExchange is formed
-        under the same mechanisms and constraints as the signed_params
-        of a traditional ServerKeyExchange when using an FFDHE
-        ciphersuite (see Section 7.4.3 of <xref target="RFC5246"/>).
-      </t>
-      
-        <t>
-          This replacement of the ServerKeyExchange is intended to meet two goals:
-          <list>
-            <t>
-              The size of the handshake is reduced (significantly, in
-              the case of a large prime modulus).
-            </t>
-            <t>
-              The introduction of the fixed label should make it so
-              that this signature should not be re-playable in a
-              subsequent key exchange that does not indicate named
-              FFDHE groups.
-            </t>
-          </list>
-        </t>
-      </section>
     </section>
     <section anchor="optimizations" title="Optimizations">
       <t>In a key exchange with a successfully negotiated known FFDHE
@@ -570,12 +494,6 @@ cryptographic levels?)
 
     <section anchor="IANA" title="IANA Considerations">
       <t>
-        IANA maintains the registry for TLS HandshakeType.  It should
-        allocate a new value in that registry (TBD1) for
-        FFDHEKeyExchange.
-      </t>
-      
-      <t>
         IANA maintains the registry currently known as EC Named Curves
         (originally defined in <xref target="RFC4492"/> and updated by
         <xref target="RFC7027"/>) at <eref
@@ -631,11 +549,11 @@ cryptographic levels?)
     <section anchor="Security" title="Security Considerations">
       <section title="Negotiation resistance to active attacks">
         <t>
-          Because the contents of this extension is hashed in the
-          finished message, an active MITM that tries to filter or
-          omit groups will cause the handshake to fail, but possibly
-          not before getting the peer to do something they would not
-          otherwise have done.
+          Because the contents of the NamedCurves extension is hashed
+          in the finished message, an active MITM that tries to filter
+          or omit groups will cause the handshake to fail, but
+          possibly not before getting the peer to do something they
+          would not otherwise have done.
         </t>
         <t>
           An attacker who impersonates the server can try to do any of
@@ -655,11 +573,12 @@ cryptographic levels?)
             </t>
             <t>
               Pretend that a compatible server is actually
-              non-compatible by negotiating a DHE ciphersuite and no
-              extension, with an explicit (perhaps weak) group chosen
-              by the server.  [XXX what are the worst consequences in
-              this case?  What might the client leak before it notices
-              that the handshake fails? XXX]
+              non-compatible by negotiating a DHE ciphersuite, with a
+              custom (perhaps weak) group chosen by the attacker.
+              This is no worse than the current scenario, and would
+              require the attacker to be able to sign the
+              ServerDHParams, which should not be possible without
+              access to the server's secret key.
             </t>
           </list>
         </t>
@@ -668,19 +587,20 @@ cryptographic levels?)
           following:
           <list>
             <t>
-              Pretend that a compatible client is not compliant (e.g. by
-              not offering this extension).  This could cause the server
-              to negotiate a weaker DHE group during the handshake, but
-              it would fail to complete during the final check of the
-              Finished message.
+              Pretend that a compatible client is not compatible
+              (e.g. by not offering the NamedCurves extension, or by
+              replacing the NamedCurves extension with one that
+              includes no FFDHE groups).  This could cause the server
+              to negotiate a weaker DHE group during the handshake, or
+              to select a non-FFDHE ciphersuite, but it would fail to
+              complete during the final check of the Finished message.
             </t>
             <t>
-              Pretend that a non-compatible client is compatible.
-              This could cause the server to send an FFDHEKeyExchange
-              instead of a ServerKeyExchange (see <xref
-              target="FFDHEKeyExchange"/>), which would not be
-              validatable by the client. It is not clear how this
-              could be an attack.
+              Pretend that a non-compatible client is compatible
+              (e.g. by .  This could cause the server to select a
+              particular named group in the ServerKeyExchange, or to
+              avoid selecting an FFDHE ciphersuite.  The peers would
+              fail to compute the final check of the Finished message.
             </t>
             <t>
               Change the list of groups offered by the client (e.g. by
