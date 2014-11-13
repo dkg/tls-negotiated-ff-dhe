@@ -444,17 +444,6 @@
       
     </section>
 
-<!--
-
-guidance to servers for which named group to choose (choose based on
-trying to "balance" with other selected mechanisms, like server host
-pubkey and cipher and MAC?)
-
-guidance to clients for what to offer (offer based on acceptable
-cryptographic levels?)
-
--->
-
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>
         Thanks to Fedor Brunner, Dave Fergemann, Sandy Harris, Watson
