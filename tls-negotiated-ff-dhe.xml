@@ -108,9 +108,9 @@
       parameters TLS servers should offer and clients should accept.
       This document offers a solution to these shortcomings for
       compatible peers by using a section of the TLS "EC Named Curve
-      Registry" to establish common DH parameters with known structure
-      and a mechanism for peers to negotiate support for these
-      groups.</t>
+      Registry" to establish common finite-field DH parameters with
+      known structure and a mechanism for peers to negotiate support
+      for these groups.</t>
     </abstract>
   </front>
 
@@ -118,7 +118,7 @@
     <section title="Introduction">
       <t>Traditional <xref target="RFC5246">TLS</xref> offers a
       Diffie-Hellman ephemeral (DHE) key exchange mode which provides
-      Perfect Forward Secrecy for the connection.  The client offers a
+      Forward Secrecy for the connection.  The client offers a
       ciphersuite in the ClientHello that includes DHE, and the server
       offers the client group parameters g and p.  If the client does
       not consider the group strong enough (e.g. if p is too small, or
@@ -533,7 +533,7 @@
             </t>
             <t>
               Pretend that a compatible server is actually
-              non-compatible by negotiating a non-DHE ciphersuite. This
+              non-compatible by negotiating a non-FFDHE ciphersuite. This
               is no different than MITM ciphersuite filtering.
             </t>
             <t>
@@ -610,6 +610,10 @@
           (ECDHE) key exchange, which is defined in <xref
           target="RFC4492"/>.
         </t>
+        <t>
+          Measured by cost to the TLS peers, ECDHE appears today to
+          offer much a stronger key exchange than FFDHE.
+        </t>
       </section>
       <section title="Deprecating weak groups">
         <t>
@@ -668,14 +672,14 @@
           situation).
         </t>
       </section>
-      <section title="Replay attacks from non-negotiated FF DHE">
+      <section title="Replay attacks from non-negotiated FFDHE">
         <t>
           <xref target="SECURE-RESUMPTION" />, <xref
           target="CROSS-PROTOCOL"/>, and <xref
           target="SSL3-ANALYSIS"/> all show a malicious peer using a
           bad FFDHE group to maneuver a client into selecting a
           pre-master secret of the peer's choice, which can be
-          replayed to another server using a non-DHE key exchange, and
+          replayed to another server using a non-FFDHE key exchange, and
           can then be bootstrapped to replay client authentication.
         </t>
         <t>
@@ -692,6 +696,30 @@
           but may be a reasonable choice for clients performing client
           certificate authentication, or who have other reason to be
           concerned about server-controlled pre-master secrets.
+        </t>
+      </section>
+      <section title="Forward Secrecy">
+        <t>One of the main reasons to prefer FFDHE ciphersuites is
+        Forward Secrecy, the ability to resist decryption even if when
+        the endpoint's long-term secret key (usually RSA) is revealed
+        in the future.
+        </t>
+        <t>This property depends on both sides of the connection
+        discarding their ephemeral keys promptly.  Implementations
+        should wipe their FFDHE secret key material from memory as
+        soon as it is no longer needed, and should never store it in
+        persistent storage.
+        </t>
+        <t>Forward secrecy also depends on the strength of the
+        Diffie-Hellman group; using a very strong symmetric cipher
+        like AES256 with a forward-secret ciphersuite, but generating
+        the keys with a much weaker group like dhe2432 simply moves
+        the cost to an attacker from attacking the symmetric cipher to
+        attacking the dh_Ys or dh_Yc ephemeral keyshares.
+        </t>
+        <t>If the goal is to provide forward secrecy, attention should
+        be paid to all parts of the ciphersuite selection process,
+        both key exchange and symmetric cipher choice.
         </t>
       </section>
     </section>
