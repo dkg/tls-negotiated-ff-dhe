@@ -717,6 +717,34 @@
         both key exchange and symmetric cipher choice.
         </t>
       </section>
+      <section title="False Start">
+        <t>
+          Clients capable of TLS False Start <xref
+          target="FALSE-START"/> may receive a proposed FFDHE group
+          from a server that is attacker-controlled.  In particular,
+          the attacker can modify the ClientHello to strip the
+          proposed FFDHE groups, which may cause the server to offer a
+          weaker FFDHE group than it should, and this will not be
+          detected until receipt of the server's Finished message.
+          This could cause the a client using the False Start protocol
+          modification to send data encrypted under a weak key
+          agreement.
+        </t>
+        <t>
+          Clients should have their own classification of FFDHE groups
+          that are "cryptographically strong" in the same sense
+          described in the description of symmetric ciphers in <xref
+          target="FALSE-START"/>, and MUST offer at least one of these
+          in the initial handshake if they contemplate using the False
+          Start protocol modification.
+        </t>
+        <t>
+          Compatible clients performing a full handshake MUST NOT use
+          the False Start protocol modification if the server selects
+          an FFDHE ciphersuite but sends a group that is not
+          cryptographically strong from the client's perspective.
+        </t>
+      </section>
     </section>
 
     <section anchor="Privacy" title="Privacy Considerations">
@@ -758,6 +786,18 @@
 
       &RFC5246;
 
+      <reference anchor="FALSE-START">
+        <front>
+          <title>Transport Layer Security (TLS) False Start</title>
+          <author initials="A." surname="Langley" fullname="Adam Langley"><organization>Google</organization></author>
+          <author initials="N." surname="Modadugu" fullname="Nagendra Modadugu"><organization>Independent</organization></author>
+          <author initials="B." surname="Moeller" fullname="Bodo Moeller"><organization>Google</organization></author>
+          <date month="November" year="2014"/>
+        </front>
+        <seriesInfo name="Work in Progress," value="draft-bmoeller-tls-falsestart-01"/>
+      </reference>
+
+      
     </references>
 
     <references title="Informative References">
