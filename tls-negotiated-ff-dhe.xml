@@ -10,6 +10,7 @@
 <!ENTITY RFC3526 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3526.xml">
 <!ENTITY RFC4419 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4419.xml">
 <!ENTITY RFC4492 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4492.xml">
+<!ENTITY RFC5226 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5226.xml">
 <!ENTITY RFC5246 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml">
 <!ENTITY RFC7027 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7027.xml">
 ]>
@@ -158,10 +159,11 @@
       effects.</t>
 
       <section title="Requirements Language">
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-        document are to be interpreted as described in <xref
-        target="RFC2119"/>.</t>
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+        "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+        "OPTIONAL" in this document are to be interpreted as described
+        in <xref target="RFC2119"/>. The term "PRIVATE USE" is to be
+        interpreted as described in <xref target="RFC5226"/>.</t>
       </section>
 
       <section title="Vocabulary">
@@ -474,7 +476,18 @@
         "Elliptic curve groups".
       </t>
       <t>
-        This document allocates five codepoints in the registry, as follows:
+        This document allocates five well-defined codepoints in the
+        registry for specific Finite Field Diffie-Hellman groups
+        defined in <xref target="named_group_registry"/>.
+      </t>
+      <t>
+        In addition, the four highest codepoints in this range
+        (508-511, inclusive) are designated for PRIVATE USE by peers
+        who have custom Finite Field Diffie-Hellman groups that they
+        wish to signal internally.
+      </t>
+      <t>
+        The updated registry section should be as follows:
       </t>
 
       <texttable align="left">
@@ -507,6 +520,11 @@
         <c>ffdhe8192</c>
         <c>Y</c>
         <c>[this document]</c>
+
+        <c>508-511 (inclusive)</c>
+        <c>PRIVATE USE</c>
+        <c>-</c>
+        <c>-</c>
       </texttable> 
 
    </section>
@@ -798,6 +816,8 @@
       &RFC2119;
 
       &RFC4492;
+
+      &RFC5226;
 
       &RFC5246;
 
