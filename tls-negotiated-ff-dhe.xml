@@ -767,9 +767,9 @@
           Clients should have their own classification of FFDHE groups
           that are "cryptographically strong" in the same sense
           described in the description of symmetric ciphers in <xref
-          target="FALSE-START"/>, and MUST offer at least one of these
-          in the initial handshake if they contemplate using the False
-          Start protocol modification.
+          target="FALSE-START"/>, and SHOULD offer at least one of
+          these in the initial handshake if they contemplate using the
+          False Start protocol modification with an FFDHE ciphersuite.
         </t>
         <t>
           Compatible clients performing a full handshake MUST NOT use
