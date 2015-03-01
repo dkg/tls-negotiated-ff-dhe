@@ -73,7 +73,7 @@
       </address>
     </author>
 
-    <date year="2014" />
+    <date year="2015" />
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
          in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -380,10 +380,10 @@
           security level, and provides a lower-bound on the range of
           secret exponents that should preserve it.  For example,
           rather than doing 2*2*3072 multiplications for a ffdhe3072
-          handshake, each peer can choose to do 2*2*250
+          handshake, each peer can choose to do 2*2*275
           multiplications by choosing their secret exponent from the
-          range [2^249,2^250] (that is, a m-bit integer where m is at
-          least 224) and still keep the approximate 125-bit security
+          range [2^274,2^275] (that is, a m-bit integer where m is at
+          least 275) and still keep the same approximate security
           level.
         </t>
         <t>
@@ -599,6 +599,16 @@
         implementations ("future systems") should use FFDHE group
         sizes of at least 3072 bits.  ffdhe3072 is intended for use in
         these implementations.
+        </t>
+        <t>
+          Other sources (e.g. <xref target="NIST"/>) estimate the
+          security levels of the DLOG problem to be slightly more
+          difficult than <xref target="ENISA"/>.  This document's
+          suggested minimum exponent sizes in <xref
+          target="named_group_registry"/> for implementations that use
+          the short exponents optimization (<xref
+          target="short_exponents"/>) are deliberately conservative to
+          account for the range of these estimates.
         </t>
       </section>
       <section title="Finite-Field DHE only">
@@ -958,6 +968,19 @@
         </front>
       </reference>
 
+      <reference anchor="NIST"
+                 target="http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57_part1_rev3_general.pdf">
+        <front>
+          <title>NIST Special Publication 800-57. Recommendation for
+          key management – Part 1: General (Revision 3)</title>
+          <author>
+            <organization>National Institute of Standards and Technology</organization>
+          </author>
+          <date year="2012" />
+        </front>
+      </reference>
+        
+
    </references>
 
     <section anchor="named_group_registry" title="Named Group Registry">
@@ -1036,7 +1059,7 @@
         <t>The estimated symmetric-equivalent strength of this group is 103 bits.</t>
         <t>Peers using ffdhe2048 that want to optimize their key
         exchange with a <xref target="short_exponents">short
-        exponent</xref> should choose a secret key of at least 206
+        exponent</xref> should choose a secret key of at least 225
         bits.</t>
       </section>
 
@@ -1091,7 +1114,7 @@
         <t>The estimated symmetric-equivalent strength of this group is 125 bits.</t>
         <t>Peers using ffdhe3072 that want to optimize their key
         exchange with a <xref target="short_exponents">short
-        exponent</xref> should choose a secret key of at least 250
+        exponent</xref> should choose a secret key of at least 275
         bits.</t>
       </section>
 
@@ -1159,7 +1182,7 @@
         is 150 bits.</t>
         <t>Peers using ffdhe4096 that want to optimize their key
         exchange with a <xref target="short_exponents">short
-        exponent</xref> should choose a secret key of at least 300
+        exponent</xref> should choose a secret key of at least 325
         bits.</t>
       </section>
       <section anchor="ffdhe6144" title="ffdhe6144">
@@ -1246,7 +1269,7 @@
         is 175 bits.</t>
         <t>Peers using ffdhe6144 that want to optimize their key
         exchange with a <xref target="short_exponents">short
-        exponent</xref> should choose a secret key of at least 350
+        exponent</xref> should choose a secret key of at least 375
         bits.</t>
       </section>
       <section anchor="ffdhe8192" title="ffdhe8192">
@@ -1355,7 +1378,7 @@
         is 192 bits.</t>
         <t>Peers using ffdhe8192 that want to optimize their key
         exchange with a <xref target="short_exponents">short
-        exponent</xref> should choose a secret key of at least 384
+        exponent</xref> should choose a secret key of at least 400
         bits.</t>
       </section>
 
