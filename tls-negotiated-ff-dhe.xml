@@ -40,7 +40,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-tls-negotiated-ff-dhe-06" ipr="trust200902" updates="4492, 5246, 4346, 2246">
+<rfc category="info" docName="draft-ietf-tls-negotiated-ff-dhe-07" ipr="trust200902" updates="4492, 5246, 4346, 2246">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
@@ -204,7 +204,7 @@
         <artwork><![CDATA[
         enum {
         // other already defined elliptic curves (see RFC 4492)
-            ffdhe2432(256), ffdhe3072(257), ffdhe4096(258),
+            ffdhe2048(256), ffdhe3072(257), ffdhe4096(258),
             ffdhe6144(259), ffdhe8192(260),
         //
         } NamedCurve;
