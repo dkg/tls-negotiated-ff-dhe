@@ -40,7 +40,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-ietf-tls-negotiated-ff-dhe-07" ipr="trust200902" updates="4492, 5246, 4346, 2246">
+<rfc category="info" docName="draft-ietf-tls-negotiated-ff-dhe-08" ipr="trust200902" updates="4492, 5246, 4346, 2246">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
@@ -449,11 +449,12 @@
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>
         Thanks to Fedor Brunner, Dave Fergemann, Niels Ferguson, Sandy
-        Harris, Watson Ladd, Nikos Mavrogiannopolous, Niels
-        M&#246;ller, Bodo Moeller, Kenny Paterson, Eric Rescorla, Tom
-        Ritter, Rene Struik, Martin Thomson, Sean Turner, and other
-        members of the TLS Working Group for their comments and
-        suggestions on this draft.  Any mistakes here are not theirs.
+        Harris, Tero Kivinen, Watson Ladd, Nikos Mavrogiannopolous,
+        Niels M&#246;ller, Bodo Moeller, Kenny Paterson, Eric
+        Rescorla, Tom Ritter, Rene Struik, Martin Thomson, Sean
+        Turner, and other members of the TLS Working Group for their
+        comments and suggestions on this draft.  Any mistakes here are
+        not theirs.
       </t>
     </section>
 
@@ -1041,7 +1042,7 @@
       <section anchor="ffdhe2048" title="ffdhe2048">
         <t>The 2048-bit group has registry value 256, and is calcluated
         from the following formula:</t>
-        <t>The modulus is: p = 2^2048 - 2^1984 + {[2^1918 * e] + 560315 } * 2^64 - 1 </t>
+        <t>The modulus is: p = 2^2048 - 2^1984 + {[2^1918 * e] + 560316 } * 2^64 - 1 </t>
         <t>The hexadecimal representation of p is:</t>
         <figure>
         <artwork><![CDATA[
