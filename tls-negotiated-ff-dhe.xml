@@ -581,10 +581,12 @@
             </t>
             <t>
               Pretend that a non-compatible client is compatible
-              (e.g. by .  This could cause the server to select a
-              particular named group in the ServerKeyExchange, or to
-              avoid selecting an FFDHE ciphersuite.  The peers would
-              fail to compute the final check of the Finished message.
+              (e.g. by adding the Supported Groups extension, or by
+              adding FFDHE groups to the extension).  This could cause
+              the server to select a particular named group in the
+              ServerKeyExchange, or to avoid selecting an FFDHE
+              ciphersuite.  The peers would fail to compute the final
+              check of the Finished message.
             </t>
             <t>
               Change the list of groups offered by the client (e.g. by
