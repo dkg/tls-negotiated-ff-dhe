@@ -192,6 +192,12 @@
       data type (enum NamedCurve) is also expanded from "named curve"
       to "named group".</t>
 
+      <t>Additionally, we explicitly relax the requirement about when
+      the Supported Groups extension can be sent.  This extension MAY
+      be sent by the client when either FFDHE or ECDHE ciphersuites
+      are listed.
+      </t>
+
       <t>Codepoints in the NamedCurve registry with a high byte of
       0x01 (that is, between 256 and 511 inclusive) are set aside for
       FFDHE groups, though only a small number of them are initially
