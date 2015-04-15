@@ -242,7 +242,7 @@
       mechanism.</t>
 
       <t>The compatible client that wants to be able to negotiate
-      strong FFDHE SHOULD send a "Supported Groups" extension 
+      strong FFDHE sends a "Supported Groups" extension 
       (identified by type elliptic_curves(10) in <xref target="RFC4492"/>) in the
       ClientHello, and include a list of known FFDHE groups in the
       extension data, ordered from most preferred to least preferred.
@@ -295,13 +295,13 @@
       extension from a client that includes any FFDHE group (i.e. any
       codepoint between 256 and 511 inclusive, even if unknown to the server), and if none of the
       client-proposed FFDHE groups are known and acceptable to the
-      server, then the server SHOULD NOT select an FFDHE ciphersuite.
+      server, then the server MUST NOT select an FFDHE ciphersuite.
       In this case, the server SHOULD select an acceptable non-FFDHE
       ciphersuite from the client's offered list.  If the extension is
       present with FFDHE groups, none of the client's offered groups
       are acceptable by the server, and none of the client's proposed
       non-FFDHE ciphersuites are acceptable to the server, the server
-      SHOULD end the connection with a fatal TLS alert of type
+      MUST end the connection with a fatal TLS alert of type
       insufficient_security(71).
       </t>
       <t>
