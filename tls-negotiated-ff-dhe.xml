@@ -151,11 +151,11 @@
       "elliptic_curves(10)" extension (described here as "Supported
       Groups" extension) for clients advertising support for DHE with
       these groups.  This document also provides guidance for
-      compliant peers to take advantage of the additional security,
+      compatible peers to take advantage of the additional security,
       availability, and efficiency offered.</t>
 
-      <t>The use of this mechanism by one compliant peer when
-      interacting with a non-compliant peer should have no detrimental
+      <t>The use of this mechanism by one compatible peer when
+      interacting with a non-compatible peer should have no detrimental
       effects.</t>
 
       <section title="Requirements Language">
