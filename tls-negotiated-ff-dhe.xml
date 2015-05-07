@@ -277,15 +277,16 @@
                 local policy, or it MAY decide to terminate the
                 connection with a fatal insufficient_security(71)
                 alert.</t>
-                <t>If the selected group matches an offered FFDHE
-                group exactly, the the client MUST verify that dh_Ys
-                is in the range 1 &lt; dh_Ys &lt; dh_p - 1. If dh_Ys
-                is not in this range, the client MUST terminate the
-                connection with a fatal handshake_failure(40) alert.
+                <t>If the client continues (either because the server
+                offered a matching group, or because local policy
+                permits the offered custom group), the client MUST
+                verify that dh_Ys is in the range 1 &lt; dh_Ys &lt;
+                dh_p - 1. If dh_Ys is not in this range, the client
+                MUST terminate the connection with a fatal
+                handshake_failure(40) alert.
                 </t>
-                <t>If the selected group matches an offered FFDHE
-                group exactly, and dh_Ys is in range, then the client
-                SHOULD continue with the connection as usual.
+                <t>If dh_Ys is in range, then the client SHOULD
+                continue with the connection as usual.
                 </t>
               </list>
       </t>
@@ -306,16 +307,16 @@
       </t>
       <t>
       If at least one FFDHE ciphersuite is present in the client
-      ciphersuite list, and the Supported Groups extension is present
-      in the ClientHello, but the extension does not include any FFDHE
-      groups (i.e. no codepoints between 256 and 511 inclusive), then
-      the server knows that the client is not compatible with this
+      ciphersuite list, and the Supported Groups extension is either
+      absent from the ClientHello entirely or contains no FFDHE groups
+      (i.e. no codepoints between 256 and 511 inclusive), then the
+      server knows that the client is not compatible with this
       document.  In this scenario, a server MAY choose to select a
       non-FFDHE ciphersuite, or MAY choose an FFDHE ciphersuite and
-      offer an FFDHE group of its choice to the client as part
-      of a traditional ServerKeyExchange.
+      offer an FFDHE group of its choice to the client as part of a
+      traditional ServerKeyExchange.
       </t>
-      
+
       <t>A compatible TLS server that receives the Supported Groups
       extension with FFDHE codepoints in it, and which selects an
       FFDHE ciphersuite MUST select one of the client's offered
@@ -344,11 +345,10 @@
         ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
-      <t>When a compatible server selects an FFDHE group from among a
-      client's Supported Groups, and the client sends a
-      ClientKeyExchange, the server MUST verify that 1 &lt; dh_Yc &lt;
-      dh_p - 1.  If it is out of range, the server MUST terminate the
-      connection with fatal handshake_failure(40) alert.
+      <t>When an FFDHE ciphersuite is chosen, and the client sends
+      a ClientKeyExchange, the server MUST verify that 1 &lt; dh_Yc
+      &lt; dh_p - 1.  If dh_Yc is out of range, the server MUST
+      terminate the connection with fatal handshake_failure(40) alert.
       </t>
 
     </section>
