@@ -290,6 +290,41 @@
                 </t>
               </list>
       </t>
+      <section anchor="client-local-policy" title="Client Local Policy on Custom Groups">
+        <t>
+          Compatible clients that are willing to accept FFDHE
+          ciphersuites from non-compatible servers may have local
+          policy about what custom FFDHE groups they are willing to
+          accept.  This local policy presents a risk to clients, who
+          may accept weakly-protected communications from
+          misconfigured servers.
+        </t>
+
+        <t>
+          This draft cannot enumerate all possible safe local policy
+          (the safest may be to simply reject all custom groups), but
+          compatible clients that accept some custom groups from the
+          server MUST do at least cursory checks on group size, and
+          may take other properties into consideration as well.
+        </t>
+        
+        <t>
+          A compatible client that accepts FFDHE ciphersuites using
+          custom groups from non-compatible servers MUST reject any
+          group with |dh_p| &lt; 768 bits, and SHOULD reject any group
+          with |dh_p| &lt; 1024 bits.
+        </t>
+
+        <t>
+          A compatible client that rejects a non-compatible server's
+          custom group may decide to retry the connection while
+          omitting all FFDHE ciphersuites from the ClientHello.  A
+          client SHOULD only use this approach if it successfully
+          verified the server's expected signature over the
+          ServerDHParams, to avoid being forced by an active attacker
+          into a non-preferred ciphersuite.
+        </t>
+      </section>
     </section>
     <section anchor="server" title="Server Behavior">
       <t>If a compatible TLS server receives a Supported Groups
@@ -490,8 +525,8 @@
       <t>
         In addition, the four highest codepoints in this range
         (508-511, inclusive) are designated for PRIVATE USE by peers
-        who have custom Finite Field Diffie-Hellman groups that they
-        wish to signal internally.
+        who have privately-developed Finite Field Diffie-Hellman
+        groups that they wish to signal internally.
       </t>
       <t>
         The updated registry section should be as follows:
