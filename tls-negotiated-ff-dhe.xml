@@ -252,9 +252,9 @@
       ordering SHOULD be based on client preference, but see <xref
       target="preference_ordering"/> for more nuance.</t>
 
-      <t>A client that offers any of these values in the elliptic_curves
-      extension SHOULD ALSO include at least one FFDHE ciphersuite in
-      the Client Hello.</t>
+      <t>A client that offers a "Supported Groups" extension
+      containing an FFDHE group SHOULD also include at least one FFDHE
+      ciphersuite in the Client Hello.</t>
 
       <t>A client who offers a group MUST be able and willing to
       perform a DH key exchange using that group.</t>
