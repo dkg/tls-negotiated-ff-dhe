@@ -649,7 +649,7 @@
         </t>
         <t>
           Measured by computational cost to the TLS peers, ECDHE appears today to
-          offer much a stronger key exchange than FFDHE.
+          offer much a stronger key exchange mechanism than FFDHE.
         </t>
       </section>
       <section title="Deprecating weak groups">
@@ -768,7 +768,7 @@
           proposed FFDHE groups, which may cause the server to offer a
           weaker FFDHE group than it should, and this will not be
           detected until receipt of the server's Finished message.
-          This could cause the a client using the False Start protocol
+          This could cause a client using the False Start protocol
           modification to send data encrypted under a weak key
           agreement.
         </t>
