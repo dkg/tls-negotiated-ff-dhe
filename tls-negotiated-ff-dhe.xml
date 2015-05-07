@@ -139,7 +139,7 @@
       connecting, but must select DH parameters with insufficient
       knowledge.</t>
 
-      <t>Additionally, the DH parameters chosen by the server may have
+      <t>Additionally, the DH parameters selected by the server may have
       a known structure which renders them secure against a small
       subgroup attack, but a client receiving an arbitrary p and g has no
       efficient way to verify that the structure of a new group is
@@ -311,8 +311,8 @@
       absent from the ClientHello entirely or contains no FFDHE groups
       (i.e. no codepoints between 256 and 511 inclusive), then the
       server knows that the client is not compatible with this
-      document.  In this scenario, a server MAY choose to select a
-      non-FFDHE ciphersuite, or MAY choose an FFDHE ciphersuite and
+      document.  In this scenario, a server MAY select a
+      non-FFDHE ciphersuite, or MAY select an FFDHE ciphersuite and
       offer an FFDHE group of its choice to the client as part of a
       traditional ServerKeyExchange.
       </t>
@@ -336,7 +336,7 @@
       </t>
 
       <t>
-        If a non-anonymous FFDHE ciphersuite is chosen, and the TLS
+        If a non-anonymous FFDHE ciphersuite is selected, and the TLS
         client has used this extension to offer an FFDHE group of
         comparable or greater strength than the server's public key,
         the server SHOULD select an FFDHE group at least as strong as
@@ -345,7 +345,7 @@
         ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
-      <t>When an FFDHE ciphersuite is chosen, and the client sends
+      <t>When an FFDHE ciphersuite is selected, and the client sends
       a ClientKeyExchange, the server MUST verify that 1 &lt; dh_Yc
       &lt; dh_p - 1.  If dh_Yc is out of range, the server MUST
       terminate the connection with fatal handshake_failure(40) alert.
@@ -564,7 +564,7 @@
             <t>
               Pretend that a compatible server is actually
               non-compatible by negotiating a DHE ciphersuite, with a
-              custom (perhaps weak) group chosen by the attacker.
+              custom (perhaps weak) group selected by the attacker.
               This is no worse than the current scenario, and would
               require the attacker to be able to sign the
               ServerDHParams, which should not be possible without
