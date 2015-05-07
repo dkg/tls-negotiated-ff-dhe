@@ -121,11 +121,12 @@
       Diffie-Hellman ephemeral (DHE) key exchange mode which provides
       Forward Secrecy for the connection.  The client offers a
       ciphersuite in the ClientHello that includes DHE, and the server
-      offers the client group parameters generator g and modulus p.  If the client does
-      not consider the group strong enough (e.g. if p is too small, or
-      if p is not prime, or there are small subgroups), or if it is
-      unable to process the group for other reasons, the client has no
-      recourse but to terminate the connection.</t>
+      offers the client group parameters generator g and modulus p.
+      If the client does not consider the group strong enough (e.g. if
+      p is too small, or if p is not prime, or there are small
+      subgroups that cannot be easily avoided), or if it is unable to
+      process the group for other reasons, the client has no recourse
+      but to terminate the connection.</t>
 
       <t>Conversely, when a TLS server receives a suggestion for a DHE
       ciphersuite from a client, it has no way of knowing what kinds
@@ -399,7 +400,7 @@
         (dh_Ys offered by the server or dh_Yc offered by the client) by
         ensuring that 1 &lt; Y &lt; p-1.  This simple check ensures that
         the remote peer is properly behaved and isn't forcing the local
-        system into a small subgroup.</t>
+        system into the 2-element subgroup.</t>
 
         <t>To reach the same assurance with an unknown group, the
         client would need to verify the primality of the modulus,
