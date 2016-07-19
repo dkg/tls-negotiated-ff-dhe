@@ -931,22 +931,6 @@
 	<seriesInfo name="DOI" value="10.1109/SP.2014.14" />
       </reference>
 
-<!-- [rfced]  We have updated the title of the following reference entry to
-"Panopticlick: Is Your Browser Safe against Tracking" per the title of
-the website in the reference entry. Please let us know any objections.
-
-Original
-   [PANOPTICLICK]
-              Electronic Frontier Foundation, "Panopticlick: How Unique
-              - and Trackable - Is Your Browser?", 2010,
-              <https://panopticlick.eff.org/>.
-
-Updated
-   [PANOPTICLICK]
-              Electronic Frontier Foundation, "Panopticlick: Is your browser
-	      safe against tracking", <https://panopticlick.eff.org/>.
--->
-
       <reference anchor="PANOPTICLICK"
                  target="https://panopticlick.eff.org/">
         <front>
