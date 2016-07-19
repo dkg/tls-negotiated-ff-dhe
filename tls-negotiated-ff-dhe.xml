@@ -847,20 +847,8 @@
         </front>
       </reference>
 
-
-<!--[rfced] The URL in this reference entry did not work. Is another URL
-    available? Perhaps
-    http://cordis.europa.eu/docs/projects/cnect/6/216676/080/deliverables/002-DSPA20.pdf?
-
-   [ECRYPTII]
-              European Network of Excellence in Cryptology II, "ECRYPT
-              II Yearly Report on Algorithms and Keysizes (2011-2012)",
-              September 2012,
-              <http://www.ecrypt.eu.org/documents/D.SPA.20.pdf>.
--->
-
       <reference anchor="ECRYPTII"
-                 target="http://www.ecrypt.eu.org/documents/D.SPA.20.pdf">
+                 target="http://www.ecrypt.eu.org/ecrypt2/documents/D.SPA.20.pdf">
         <front>
           <title>ECRYPT II Yearly Report on Algorithms and Keysizes (2011-2012)</title>
           <author>
