@@ -715,8 +715,8 @@
           can then be bootstrapped to replay client authentication.
         </t>
         <t>
-          To prevent this attack (barring the fixes proposed in <xref
-          target="SESSION-HASH"/>), a client would need not only to
+          To prevent this attack (barring the session hash fix documented in <xref
+          target="RFC7627"/>), a client would need not only to
           implement this document, but also to reject non-negotiated
           FFDHE cipher suites whose group structure it cannot afford to
           verify.  Such a client would need to abort the initial
@@ -835,6 +835,7 @@
 <?rfc include="reference.RFC.4346"?>
 <?rfc include="reference.RFC.4419"?>
 <?rfc include="reference.RFC.7027"?>
+<?rfc include="reference.RFC.7627"?>
 
      <reference anchor="ENISA"
               target="http://www.enisa.europa.eu/activities/identity-and-trust/library/deliverables/algorithms-key-sizes-and-parameters-report">
@@ -929,53 +930,6 @@
 	<seriesInfo name="2014 IEEE Symposium on Security" value="and Privacy"/>
 	<seriesInfo name="DOI" value="10.1109/SP.2014.14" />
       </reference>
-
-
-<!--[rfced] FYI: We have updated the following reference per Section 4.8.6.4
-of RFC 7322 ("Referencing Internet-Drafts").
-
-Original
-   [SESSION-HASH]
-              Bhargavan, K., Delignat-Lavaud, A., Pironti, A., Langley,
-              A., and M. Ray, "Triple Handshakes Considered Harmful:
-              Breaking and Fixing Authentication over TLS", March 2014,
-              <https://secure-resumption.com/draft-bhargavan-tls-
-              session-hash-00.txt>.
-
-Updated
-   [SESSION-HASH]
-              Bhargavan, K., Delignat-Lavaud, A., Pironti, A., Langley,
-              A., and M. Ray, "Transport Layer Security (TLS) Session
-              Hash and Extended Master Secret Extension", Work in
-              Progress, draft-bhargavan-tls-session-hash-01, July 2014.
---> 
-
-<!-- draft-bhargavan-tls-session-hash-01: I-D Expired -->
-<reference anchor='SESSION-HASH'>
-<front>
-<title>Transport Layer Security (TLS) Session Hash and Extended Master Secret Extension</title>
-<author initials='K' surname='Bhargavan' fullname='Karthikeyan Bhargavan'>
-    <organization />
-</author>
-<author initials='A' surname='Delignat-Lavaud' fullname='Antoine Delignat-Lavaud'>
-    <organization />
-</author>
-<author initials='A' surname='Pironti' fullname='Alfredo Pironti'>
-    <organization />
-</author>
-<author initials='A' surname='Langley' fullname='Adam Langley'>
-    <organization />
-</author>
-<author initials='M' surname='Ray' fullname='Marsh Ray'>
-    <organization />
-</author>
-<date month='July' year='2014' />
-</front>
-<seriesInfo name='Work in Progress,' value='draft-bhargavan-tls-session-hash-01' />
-<format type='TXT'
-        target='http://www.ietf.org/internet-drafts/draft-bhargavan-tls-session-hash-01.txt' />
-</reference>
-
 
 <!-- [rfced]  We have updated the title of the following reference entry to
 "Panopticlick: Is Your Browser Safe against Tracking" per the title of
