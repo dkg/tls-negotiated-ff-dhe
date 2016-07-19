@@ -465,12 +465,6 @@ Section 2 and Appendix A in the document. Should these be updated to "EC Named
 Curve Registry" or "Supported Groups Registry"? 
 
 
-c) Should this sentence read "Supported Groups Registry" rather than "registry"?
-
-   New named groups SHOULD NOT be added to the registry
-   without consideration of the cost of browser fingerprinting.
-
-
 d) Is the title of Appendix A correct?
 
 Original
@@ -836,8 +830,8 @@ future.
           fingerprinting, clients SHOULD support all named groups at
           or above their minimum security threshold. 
 
-           New named
-          groups SHOULD NOT be added to the registry without
+           New
+          groups SHOULD NOT be added to the Supported Groups registry without
           consideration of the cost of browser fingerprinting.
         </t>
       </section>
