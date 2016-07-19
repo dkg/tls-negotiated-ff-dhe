@@ -460,18 +460,6 @@ review carefully and let us know how the text is to be updated.
 NOTE: Actions 4 and 5 aren't included in the IANA Considerations section
 yet. The authors have agreed to add some text.
 
-ACTION 5:
-
-In the Extensions Type registry, IANA has renamed and added a reference for
-value 10. The entry now reads
-
-10supported_groups (renamed from
-"elliptic_curves")[RFC4492][RFC-ietf-tls-negotiated-ff-dhe-10]
-
-Please see
-http://www.iana.org/assignments/tls-extensiontype-values
-
-
 b) We see instances of "NamedCurve registry" and "Named Curve registry" in
 Section 2 and Appendix A in the document. Should these be updated to "EC Named
 Curve Registry" or "Supported Groups Registry"? 
@@ -565,10 +553,11 @@ Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
         <c>RFC 7919</c>
       </texttable> 
 
-      <t>IANA has also renamed the "elliptic_curves" extension as
-      "supported_groups" and added a reference
-      to this document in the "ExtensionType Values" registry. See
-      &lt;http://www.iana.org/assignments/tls-extensiontype-values&gt;.
+      <t>
+        IANA has also renamed the "elliptic_curves" extension as
+        "supported_groups" and added a reference to this document in
+        the "ExtensionType Values" registry. See
+        &lt;http://www.iana.org/assignments/tls-extensiontype-values&gt;.
       </t>
 
     </section>
