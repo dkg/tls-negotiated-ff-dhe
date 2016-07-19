@@ -28,8 +28,6 @@ a) Throughout the text, the following terminology appears to be used
 inconsistently. Please review these occurrences and let us know if/how they may be made 
 consistent.  
 
-Supported Groups extension vs. "Supported Groups" extension
-
 b) Should "DLOG" be expanded as "discrete logarithm"?
 -->
 
@@ -124,8 +122,8 @@ Introduction.
       Registry" by this
       document) to select common DH
       groups with known structure and defining the use of the
-      "elliptic_curves(10)" extension (described here as the "Supported
-      Groups" extension) for clients advertising support for DHE with
+      "elliptic_curves(10)" extension (described here as the Supported
+      Groups extension) for clients advertising support for DHE with
       these groups.  This document also provides guidance for
       compatible peers to take advantage of the additional security,
       availability, and efficiency offered.</t>
@@ -230,17 +228,17 @@ where "Private Use" is used in the IANA Consideration section.
       mechanism.</t>
 
       <t>The compatible client that wants to be able to negotiate
-      strong FFDHE sends a "Supported Groups" extension 
+      strong FFDHE sends a Supported Groups extension 
       (identified by type elliptic_curves(10) in <xref target="RFC4492"/>) in the
       ClientHello and includes a list of known FFDHE groups in the
       extension data, ordered from most preferred to least preferred.
       If the client also supports and wants to offer ECDHE key
-      exchange, it MUST use a single "Supported Groups" extension to
+      exchange, it MUST use a single Supported Groups extension to
       include all supported groups (both ECDHE and FFDHE groups).  The
       ordering SHOULD be based on client preference, but see <xref
       target="preference_ordering"/> for more nuance.</t>
 
-      <t>A client that offers a "Supported Groups" extension
+      <t>A client that offers a Supported Groups extension
       containing an FFDHE group SHOULD also include at least one FFDHE
       cipher suite in the ClientHello.</t>
 
@@ -248,7 +246,7 @@ where "Private Use" is used in the IANA Consideration section.
       perform a DH key exchange using that group.</t>
 
       <t>A client that offers one or more FFDHE groups in the
-      "Supported Groups" extension and an FFDHE cipher suite and that
+      Supported Groups extension and an FFDHE cipher suite and that
       receives an FFDHE cipher suite from the server SHOULD take the
       following steps upon receiving the ServerKeyExchange:
               <list style="symbols">
