@@ -28,9 +28,6 @@ a) Throughout the text, the following terminology appears to be used
 inconsistently. Please review these occurrences and let us know if/how they may be made 
 consistent.  
 
-Finite Field Diffie-Hellman vs. finite field Diffie-Hellman
-vs. finite-field-based Diffie-Hellman
-
 ClientHello vs. Client Hello
 
 Supported Groups extension vs. "Supported Groups" extension
@@ -402,7 +399,7 @@ where "Private Use" is used in the IANA Consideration section.
       </section>
       <section anchor="short_exponents" title="Short Exponents">
         <t>
-          Traditional Finite Field Diffie-Hellman has each peer choose
+          Traditional finite field Diffie-Hellman has each peer choose
           their secret exponent from the range [2,p-2].  Using
           exponentiation by squaring, this means each peer must do
           roughly 2*log_2(p) multiplications, twice (once for the
@@ -551,20 +548,20 @@ Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
         to include groups based on finite fields in addition to groups
         based on elliptic curves.  IANA has added a range designation
         to the registry, indicating that values from 256-511
-        (inclusive) are set aside for "Finite Field Diffie-Hellman
+        (inclusive) are set aside for "Finite field Diffie-Hellman
         groups" and that all other entries in the registry are
         "Elliptic curve groups".
       </t>
       <t>
         This document allocates five well-defined codepoints in the
-        registry for specific Finite Field Diffie-Hellman groups
+        registry for specific finite field Diffie-Hellman groups
         defined in <xref target="named_group_registry"/>.
       </t>
       <t>
         In addition, the four highest codepoints in the range
         508-511, inclusive, are designated for Private Use <xref
 	target="RFC5226"/> by peers
-        who have privately developed Finite Field Diffie-Hellman
+        who have privately developed finite field Diffie-Hellman
         groups that they wish to signal internally.
       </t>
       <t>
@@ -722,7 +719,7 @@ Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
       <section title="Finite Field DHE Only">
         <t>
           Note that this document specifically targets only
-          finite field-based Diffie-Hellman ephemeral key exchange
+          finite field Diffie-Hellman ephemeral key exchange
           mechanisms.  It does not cover the non-ephemeral DH key
           exchange mechanisms, nor does it address
           ECDHE key exchange, which is defined in <xref
