@@ -60,16 +60,6 @@
       known structure and a mechanism for peers to negotiate support
       for these groups.</t>
 
-<!-- [rfced] FYI: We removed the citations [RFC2246] and [RFC4346] from the
-Abstract per Section 4.3 of the RFC Style Guide (RFC 7322), which states that
-"the Abstract must not contain citations". These references are not cited
-elsewhere in the document, so we added the following sentence to the
-Introduction.
-
-   This document updates TLS versions 1.0 [RFC2246], 1.1 [RFC4346], and 1.2
-   [RFC5246], as well as the TLS ECC extensions [RFC4492].
--->
-
       <t>
         This document updates TLS versions 1.0 (RFC 2246), 1.1 (RFC 4346), and
 	1.2 (RFC 5246), as well as the TLS Elliptic Curve Cryptography (ECC) extensions (RFC 4492).
