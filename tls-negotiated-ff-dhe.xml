@@ -450,18 +450,6 @@
     </section>
 
 
-<!-- [rfced]  The following questions are IANA related.  Please let us know
-how these issues should be resolved.
-
-a) Note that IANA included the following note in an email about this document
-dated 2015-06-19. Where possible, we have updated the document to address
-these updates. However, some of the updates are not clear to us.  Please
-review carefully and let us know how the text is to be updated.
-
-NOTE: Actions 4 and 5 aren't included in the IANA Considerations section
-yet. The authors have agreed to add some text.
--->
-
     <section anchor="IANA" title="IANA Considerations">
       <t>
         This document renames the "EC Named Curve Registry"
