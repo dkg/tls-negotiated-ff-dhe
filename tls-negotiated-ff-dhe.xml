@@ -124,12 +124,6 @@
         "OPTIONAL" in this document are to be interpreted as described
         in <xref target="RFC2119"/>. 
 
-<!-- [rfced]  FYI: we removed the following sentence as we do not consider it
-part of the requirements language. We have added a citation for [RFC5226]
-where "Private Use" is used in the IANA Consideration section.
-
-   The term "PRIVATE USE" is to be interpreted as described in [RFC5226].
--->
        </t>
       </section>
 
