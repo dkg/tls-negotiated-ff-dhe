@@ -149,9 +149,10 @@
       currently known as "elliptic_curves" (Section 5.1.1. of <xref
       target="RFC4492"/>) to indicate known finite field groups.  The
       extension's semantics are expanded from "Supported Elliptic
-      Curves" to "Supported Groups".  The semantics of the extension's
-      data type (enum NamedCurve) is also expanded from "named curve"
-      to "named group".</t>
+      Curves" to "Supported Groups".  The enum datatype used in the
+      extension has been renamed from NamedCurve to NamedGroup.  Its
+      semantics are likewise expanded from "named curve" to "named
+      group".</t>
 
       <t>Additionally, we explicitly relax the requirement about when
       the Supported Groups extension can be sent.  This extension MAY
@@ -159,13 +160,13 @@
       are listed.
       </t>
 
-      <t>Codepoints in the NamedCurve registry with a high byte of
+      <t>Codepoints in the Supported Groups registry with a high byte of
       0x01 (that is, between 256 and 511, inclusive) are set aside for
       FFDHE groups, though only a small number of them are initially
       defined and we do not expect many other FFDHE groups to be added
       to this range.  No codepoints outside of this range will be
       allocated to FFDHE groups.  The new codepoints for the
-      NamedCurve registry are:</t>
+      Supported Groups registry are:</t>
 
       <figure>
         <artwork><![CDATA[
@@ -174,12 +175,12 @@
             ffdhe2048(256), ffdhe3072(257), ffdhe4096(258),
             ffdhe6144(259), ffdhe8192(260),
         //
-        } NamedCurve;
+        } NamedGroup;
             ]]></artwork>
       </figure>
 
-      <t>These additions to the Named Curve registry are described in
-      detail in <xref target="named_group_registry"/>.  They are all
+      <t>These additions to the Supported Groups registry are described in
+      detail in <xref target="supported_groups_registry"/>.  They are all
       safe primes derived from the base of the natural logarithm
       ("e"), with the high and low 64 bits set to 1 for efficient
       Montgomery or Barrett reduction.
@@ -459,22 +460,6 @@ review carefully and let us know how the text is to be updated.
 
 NOTE: Actions 4 and 5 aren't included in the IANA Considerations section
 yet. The authors have agreed to add some text.
-
-b) We see instances of "NamedCurve registry" and "Named Curve registry" in
-Section 2 and Appendix A in the document. Should these be updated to "EC Named
-Curve Registry" or "Supported Groups Registry"? 
-
-
-d) Is the title of Appendix A correct?
-
-Original
-Appendix A.  Named Group Registry
-
-Perhaps
-Appendix A.  Supported Groups Registry
-
-Or
-Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
 -->
 
     <section anchor="IANA" title="IANA Considerations">
@@ -497,7 +482,7 @@ Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
       <t>
         This document allocates five well-defined codepoints in the
         registry for specific finite field Diffie-Hellman groups
-        defined in <xref target="named_group_registry"/>.
+        defined in <xref target="supported_groups_registry"/>.
       </t>
       <t>
         In addition, the four highest codepoints in the range
@@ -653,7 +638,7 @@ Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
           security levels of the discrete log (DLOG) problem to be slightly more
           difficult than <xref target="ENISA"/>.  This document's
           suggested minimum exponent sizes in <xref
-          target="named_group_registry"/> for implementations that use
+          target="supported_groups_registry"/> for implementations that use
           the short-exponent optimization (<xref
           target="short_exponents"/>) are deliberately conservative to
           account for the range of these estimates.
@@ -1088,14 +1073,14 @@ Perhaps
    </references>
 
 
-    <section anchor="named_group_registry" title="Named Group Registry">
+    <section anchor="supported_groups_registry" title="Supported Groups Registry (formerly &quot;EC Named Curve Registry&quot;)">
       <t>
         Each description below indicates the group itself, its
         derivation, its expected strength (estimated roughly from
         guidelines in <xref target="ECRYPTII"/>), and whether it is
         recommended for use in TLS key exchange at the given security
         level.  It is not recommended to add further finite field
-        groups to the NamedCurves registry; any attempt to do so
+        groups to the Supported Groups registry; any attempt to do so
         should consider <xref target="Client-Fingerprinting"/>.
       </t>
       <t>
