@@ -732,17 +732,8 @@
       </section>
       <section title="Forward Secrecy">
 
-<!-- [rfced] Should "if when" in this sentence read simply "if" or "when"?    
-
-Original
-One of the main reasons to prefer FFDHE ciphersuites is Forward
-Secrecy, the ability to resist decryption even if when the
-endpoint's long-term secret key (usually RSA) is revealed in the
-future.
--->   
-
         <t>One of the main reasons to prefer FFDHE ciphersuites is
-        forward secrecy, the ability to resist decryption even if when
+        forward secrecy, the ability to resist decryption even if
         the endpoint's long-term secret key (usually RSA) is revealed
         in the future.
         </t>
