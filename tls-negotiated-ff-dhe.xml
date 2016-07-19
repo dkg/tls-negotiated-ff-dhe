@@ -1,64 +1,46 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- This template is for creating an Internet Draft using xml2rfc,
-     which is available here: http://xml2rfc.ietf.org. -->
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-<!-- One method to get references from the online citation libraries.
-     There has to be one entity for each item to be referenced. 
-     An alternate method (rfc include) is described in the references. -->
+<?xml version="1.0" encoding="US-ASCII"?>
 
-<!ENTITY RFC2119 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
-<!ENTITY RFC2246 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2246.xml">
-<!ENTITY RFC3526 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3526.xml">
-<!ENTITY RFC4346 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4346.xml">
-<!ENTITY RFC4419 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4419.xml">
-<!ENTITY RFC4492 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4492.xml">
-<!ENTITY RFC5226 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5226.xml">
-<!ENTITY RFC5246 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml">
-<!ENTITY RFC7027 SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7027.xml">
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
 ]>
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
-<!-- used by XSLT processors -->
-<!-- For a complete list and description of processing instructions (PIs), 
-     please see http://xml2rfc.ietf.org/authoring/README.html. -->
-<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
-     (Here they are set differently than their defaults in xml2rfc v1.32) -->
-<?rfc strict="yes" ?>
-<!-- give errors regarding ID-nits and DTD validation -->
-<!-- control the table of contents (ToC) -->
-<?rfc toc="yes"?>
-<!-- generate a ToC -->
-<?rfc tocdepth="4"?>
-<!-- the number of levels of subsections in ToC. default: 3 -->
-<!-- control references -->
-<?rfc symrefs="yes"?>
-<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
-<?rfc sortrefs="yes" ?>
-<!-- sort the reference entries alphabetically -->
-<!-- control vertical white space 
-     (using these PIs as follows is recommended by the RFC Editor) -->
-<?rfc compact="yes" ?>
-<!-- do not start each main section on a new page -->
-<?rfc subcompact="no" ?>
-<!-- keep one blank line between list items -->
-<!-- end of list of popular I-D processing instructions -->
-<rfc category="std" docName="draft-ietf-tls-negotiated-ff-dhe-10" ipr="trust200902" updates="4492, 5246, 4346, 2246">
-  <!-- category values: std, bcp, info, exp, and historic
-     ipr values: full3667, noModification3667, noDerivatives3667
-     you can add the attributes updates="NNNN" and obsoletes="NNNN" 
-     they will automatically be output with "(if approved)" -->
 
-  <!-- ***** FRONT MATTER ***** -->
+<?rfc strict="yes" ?>
+<?rfc toc="yes"?>
+<?rfc tocdepth="4"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes" ?>
+<?rfc compact="yes" ?>
+<?rfc subcompact="no" ?>
+
+<rfc number="7919"
+     category="std" 
+     submissionType="IETF"
+     consensus="yes"
+     ipr="trust200902" 
+     updates="2246, 4346, 4492, 5246">
 
   <front>
-    <!-- The abbreviated title is used in the page header - it is only necessary if the 
-         full title is longer than 39 characters -->
 
-    <title abbrev="Negotiated-FF-DHE-for-TLS">Negotiated Finite Field Diffie-Hellman Ephemeral Parameters for TLS</title>
+<!-- [rfced] Terminology and Acronyms
 
-    <!-- add 'role="editor"' below for the editors if appropriate -->
+a) Throughout the text, the following terminology appears to be used 
+inconsistently. Please review these occurrences and let us know if/how they may be made 
+consistent.  
 
-    <!-- Another author who claims to be an editor -->
+Finite Field Diffie-Hellman vs. finite field Diffie-Hellman
+vs. finite-field-based Diffie-Hellman
+
+ClientHello vs. Client Hello
+
+Supported Groups extension vs. "Supported Groups" extension
+
+b) Should "DLOG" be expanded as "discrete logarithm"?
+-->
+
+
+    <title abbrev="Negotiated FFDHE for TLS">Negotiated Finite Field
+    Diffie-Hellman Ephemeral Parameters for Transport Layer Security (TLS)</title>
 
     <author fullname="Daniel Kahn Gillmor" initials="D." surname="Gillmor">
       <organization>ACLU</organization>
@@ -68,59 +50,45 @@
           <city>New York</city>
           <region>NY</region>
           <code>10004</code>
-          <country>USA</country>
+          <country>United States</country>
         </postal>
         <phone></phone>
         <email>dkg@fifthhorseman.net</email>
-        <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
 
-    <date year="2015" />
-
-    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
-         in the current day for you. If only the current year is specified, xml2rfc will fill 
-	 in the current day and month for you. If the year is not the current one, it is 
-	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
-	 purpose of calculating the expiry date).  With drafts it is normally sufficient to 
-	 specify just the year. -->
-
-    <!-- Meta-data Declarations -->
+    <date month="June" year="2016" />
 
     <area>General</area>
-
     <workgroup>Internet Engineering Task Force</workgroup>
-
-    <!-- WG name at the upperleft corner of the doc,
-         IETF is fine for individual submissions.  
-	 If this element is not present, the default is "Network Working Group",
-         which is used by the RFC Editor as a nod to the history of the IETF. -->
-
     <keyword>Diffie-Hellman, Discrete Logarithm, Finite Field, Transport Layer Security, TLS, Negotiation</keyword>
-
-    <!-- Keywords will be incorporated into HTML output
-         files in a meta tag but they have no effect on text or nroff
-         output. If you submit your draft to the RFC Editor, the
-         keywords will be used for the search engine. -->
 
     <abstract>
       <t>Traditional finite-field-based Diffie-Hellman (DH) key
-      exchange during the TLS handshake suffers from a number of
+      exchange during the Transport Layer Security (TLS) handshake suffers from a number of
       security, interoperability, and efficiency shortcomings.  These
       shortcomings arise from lack of clarity about which DH group
       parameters TLS servers should offer and clients should accept.
       This document offers a solution to these shortcomings for
-      compatible peers by using a section of the TLS "EC Named Curve
-      Registry" to establish common finite-field DH parameters with
+      compatible peers by using a section of the TLS "Supported Groups
+      Registry" (renamed from "EC Named Curve Registry" by this document)
+      to establish common finite field DH parameters with
       known structure and a mechanism for peers to negotiate support
       for these groups.</t>
 
+<!-- [rfced] FYI: We removed the citations [RFC2246] and [RFC4346] from the
+Abstract per Section 4.3 of the RFC Style Guide (RFC 7322), which states that
+"the Abstract must not contain citations". These references are not cited
+elsewhere in the document, so we added the following sentence to the
+Introduction.
+
+   This document updates TLS versions 1.0 [RFC2246], 1.1 [RFC4346], and 1.2
+   [RFC5246], as well as the TLS ECC extensions [RFC4492].
+-->
+
       <t>
-        This draft updates TLS versions <xref
-        target="RFC2246">1.0</xref>, <xref
-        target="RFC4346">1.1</xref>, and <xref
-        target="RFC5246">1.2</xref>, as well as <xref
-        target="RFC4492">the TLS ECC extensions</xref>.
+        This document updates TLS versions 1.0 (RFC 2246), 1.1 (RFC 4346), and
+	1.2 (RFC 5246), as well as the TLS Elliptic Curve Cryptography (ECC) extensions (RFC 4492).
       </t>
     </abstract>
   </front>
@@ -128,38 +96,40 @@
   <middle>
     <section title="Introduction">
       <t>Traditional <xref target="RFC5246">TLS</xref> offers a
-      Diffie-Hellman ephemeral (DHE) key exchange mode which provides
-      Forward Secrecy for the connection.  The client offers a
-      ciphersuite in the ClientHello that includes DHE, and the server
+      Diffie-Hellman Ephemeral (DHE) key exchange mode that provides
+      forward secrecy for the connection.  The client offers a
+      cipher suite in the ClientHello that includes DHE, and the server
       offers the client group parameters generator g and modulus p.
-      If the client does not consider the group strong enough (e.g., if
-      p is too small, or if p is not prime, or there are small
-      subgroups that cannot be easily avoided), or if it is unable to
+      If the client does not consider the group strong enough (e.g., 
+      p is too small, p is not prime, or there are small
+      subgroups that cannot be easily avoided) or if it is unable to
       process the group for other reasons, the client has no recourse
       but to terminate the connection.</t>
 
       <t>Conversely, when a TLS server receives a suggestion for a DHE
-      ciphersuite from a client, it has no way of knowing what kinds
-      of DH groups the client is capable of handling, or what the
+      cipher suite from a client, it has no way of knowing what kinds
+      of DH groups the client is capable of handling or what the
       client's security requirements are for this key exchange
-      session.  For example, some widely-distributed TLS clients are not capable of
-      DH groups where p > 1024 bits.  Other TLS clients may by policy wish
+      session.  For example, some widely distributed TLS clients are not capable of
+      DH groups where p > 1024 bits.  Other TLS clients may, by policy, wish
       to use DHE only if the server can offer a stronger group (and
-      are willing to use a non-PFS key-exchange mechanism otherwise).
+      are willing to use a non-PFS (Perfect Forward Secrecy) key exchange mechanism otherwise).
       The server has no way of knowing which type of client is
-      connecting, but must select DH parameters with insufficient
+      connecting but must select DH parameters with insufficient
       knowledge.</t>
 
       <t>Additionally, the DH parameters selected by the server may have
-      a known structure which renders them secure against a small
+      a known structure that renders them secure against a small
       subgroup attack, but a client receiving an arbitrary p and g has no
       efficient way to verify that the structure of a new group is
       reasonable for use.</t>
 
       <t>This modification to TLS solves these problems by using a
-      section of the "EC Named Curves" registry to select common DH
+      section of the "Supported Groups Registry" (renamed from "EC Named Curve
+      Registry" by this
+      document) to select common DH
       groups with known structure and defining the use of the
-      "elliptic_curves(10)" extension (described here as "Supported
+      "elliptic_curves(10)" extension (described here as the "Supported
       Groups" extension) for clients advertising support for DHE with
       these groups.  This document also provides guidance for
       compatible peers to take advantage of the additional security,
@@ -169,12 +139,24 @@
       interacting with a non-compatible peer should have no detrimental
       effects.</t>
 
+   <t>This document updates TLS versions 1.0 <xref target="RFC2246"/>, 1.1 <xref
+   target="RFC4346"/>, and 1.2
+   <xref target="RFC5246"/>, as well as the TLS ECC extensions <xref target="RFC4492"/>.
+   </t>
+
       <section title="Requirements Language">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
         "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
         "OPTIONAL" in this document are to be interpreted as described
-        in <xref target="RFC2119"/>. The term "PRIVATE USE" is to be
-        interpreted as described in <xref target="RFC5226"/>.</t>
+        in <xref target="RFC2119"/>. 
+
+<!-- [rfced]  FYI: we removed the following sentence as we do not consider it
+part of the requirements language. We have added a citation for [RFC5226]
+where "Private Use" is used in the IANA Consideration section.
+
+   The term "PRIVATE USE" is to be interpreted as described in [RFC5226].
+-->
+       </t>
       </section>
 
       <section title="Vocabulary">
@@ -182,12 +164,12 @@
           The terms "DHE" or "FFDHE" are used in this document to
           refer to the finite-field-based Diffie-Hellman ephemeral key
           exchange mechanism in TLS.  TLS also supports
-          elliptic-curve-based Diffie-Hellman (ECDHE) ephemeral key
+          Elliptic Curve Diffie-Hellman Ephemeral (ECDHE) key
           exchanges <xref target="RFC4492"/>, but this document does
           not document their use.  A registry previously used only by
-          ECHDE-capable implementations is expanded in this document
-          to cover FFDHE groups as well.  "FFDHE ciphersuites" is used
-          in this document to refer exclusively to ciphersuites with
+          ECDHE-capable implementations is expanded in this document
+          to cover FFDHE groups as well.  "FFDHE cipher suites" is used
+          in this document to refer exclusively to cipher suites with
           FFDHE key exchange mechanisms, but note that these suites
           are typically labeled with a TLS_DHE_ prefix.
         </t>
@@ -195,8 +177,8 @@
     </section>
 
       <section anchor="named_group_overview" title="Named Group Overview">
-      <t>We use previously-unallocated codepoints within the extension
-      currently known as "elliptic_curves" (section 5.1.1. of <xref
+      <t>We use previously unallocated codepoints within the extension
+      currently known as "elliptic_curves" (Section 5.1.1. of <xref
       target="RFC4492"/>) to indicate known finite field groups.  The
       extension's semantics are expanded from "Supported Elliptic
       Curves" to "Supported Groups".  The semantics of the extension's
@@ -205,16 +187,16 @@
 
       <t>Additionally, we explicitly relax the requirement about when
       the Supported Groups extension can be sent.  This extension MAY
-      be sent by the client when either FFDHE or ECDHE ciphersuites
+      be sent by the client when either FFDHE or ECDHE cipher suites
       are listed.
       </t>
 
       <t>Codepoints in the NamedCurve registry with a high byte of
-      0x01 (that is, between 256 and 511 inclusive) are set aside for
+      0x01 (that is, between 256 and 511, inclusive) are set aside for
       FFDHE groups, though only a small number of them are initially
       defined and we do not expect many other FFDHE groups to be added
       to this range.  No codepoints outside of this range will be
-      allocated to FFDHE groups.  The new code points for the
+      allocated to FFDHE groups.  The new codepoints for the
       NamedCurve registry are:</t>
 
       <figure>
@@ -242,7 +224,7 @@
         primes have secretly been selected to be weak according to
         some secret criteria. <xref target="RFC3526"/> used pi for
         this value. See <xref target="choice_of_groups"/> for reasons
-        that this draft does not reuse pi.
+        that this document does not reuse pi.
       </t>
       </section>
     
@@ -255,7 +237,7 @@
       <t>The compatible client that wants to be able to negotiate
       strong FFDHE sends a "Supported Groups" extension 
       (identified by type elliptic_curves(10) in <xref target="RFC4492"/>) in the
-      ClientHello, and include a list of known FFDHE groups in the
+      ClientHello and includes a list of known FFDHE groups in the
       extension data, ordered from most preferred to least preferred.
       If the client also supports and wants to offer ECDHE key
       exchange, it MUST use a single "Supported Groups" extension to
@@ -265,31 +247,31 @@
 
       <t>A client that offers a "Supported Groups" extension
       containing an FFDHE group SHOULD also include at least one FFDHE
-      ciphersuite in the Client Hello.</t>
+      cipher suite in the Client Hello.</t>
 
       <t>A client that offers a group MUST be able and willing to
       perform a DH key exchange using that group.</t>
 
       <t>A client that offers one or more FFDHE groups in the
-      "Supported Groups" extension and an FFDHE ciphersuite, and
-      receives an FFDHE ciphersuite from the server SHOULD take the
+      "Supported Groups" extension and an FFDHE cipher suite and that
+      receives an FFDHE cipher suite from the server SHOULD take the
       following steps upon receiving the ServerKeyExchange:
-              <list>
-                <t>For non-anonymous ciphersuites where the offered
-                Certificate is valid and appropriate for the peer,
+              <list style="symbols">
+                <t>For non-anonymous cipher suites where the offered
+                certificate is valid and appropriate for the peer,
                 validate the signature over the ServerDHParams.  If
                 not valid, terminate the connection.</t>
                 <t>If the signature over ServerDHParams is valid,
                 compare the selected dh_p and dh_g with the FFDHE
                 groups offered by the client.  If none of the offered
                 groups match, the server is not compatible with this
-                draft.  The client MAY decide to continue the
+                document.  The client MAY decide to continue the
                 connection if the selected group is acceptable under
                 local policy, or it MAY decide to terminate the
                 connection with a fatal insufficient_security(71)
                 alert.</t>
                 <t>If the client continues (either because the server
-                offered a matching group, or because local policy
+                offered a matching group or because local policy
                 permits the offered custom group), the client MUST
                 verify that dh_Ys is in the range 1 &lt; dh_Ys &lt;
                 dh_p - 1. If dh_Ys is not in this range, the client
@@ -304,71 +286,71 @@
       <section anchor="client-local-policy" title="Client Local Policy on Custom Groups">
         <t>
           Compatible clients that are willing to accept FFDHE
-          ciphersuites from non-compatible servers may have local
+          cipher suites from non-compatible servers may have local
           policy about what custom FFDHE groups they are willing to
           accept.  This local policy presents a risk to clients, who
-          may accept weakly-protected communications from
+          may accept weakly protected communications from
           misconfigured servers.
         </t>
 
         <t>
-          This draft cannot enumerate all possible safe local policy
+          This document cannot enumerate all possible safe local policy
           (the safest may be to simply reject all custom groups), but
           compatible clients that accept some custom groups from the
-          server MUST do at least cursory checks on group size, and
+          server MUST do at least cursory checks on group size and
           may take other properties into consideration as well.
         </t>
         
         <t>
-          A compatible client that accepts FFDHE ciphersuites using
+          A compatible client that accepts FFDHE cipher suites using
           custom groups from non-compatible servers MUST reject any
-          group with |dh_p| &lt; 768 bits, and SHOULD reject any group
+          group with |dh_p| &lt; 768 bits and SHOULD reject any group
           with |dh_p| &lt; 1024 bits.
         </t>
 
         <t>
           A compatible client that rejects a non-compatible server's
           custom group may decide to retry the connection while
-          omitting all FFDHE ciphersuites from the ClientHello.  A
+          omitting all FFDHE cipher suites from the ClientHello.  A
           client SHOULD only use this approach if it successfully
           verified the server's expected signature over the
           ServerDHParams, to avoid being forced by an active attacker
-          into a non-preferred ciphersuite.
+          into a non-preferred cipher suite.
         </t>
       </section>
     </section>
     <section anchor="server" title="Server Behavior">
       <t>If a compatible TLS server receives a Supported Groups
-      extension from a client that includes any FFDHE group (i.e. any
-      codepoint between 256 and 511 inclusive, even if unknown to the server), and if none of the
+      extension from a client that includes any FFDHE group (i.e., any
+      codepoint between 256 and 511, inclusive, even if unknown to the server), and if none of the
       client-proposed FFDHE groups are known and acceptable to the
-      server, then the server MUST NOT select an FFDHE ciphersuite.
+      server, then the server MUST NOT select an FFDHE cipher suite.
       In this case, the server SHOULD select an acceptable non-FFDHE
-      ciphersuite from the client's offered list.  If the extension is
+      cipher suite from the client's offered list.  If the extension is
       present with FFDHE groups, none of the client's offered groups
       are acceptable by the server, and none of the client's proposed
-      non-FFDHE ciphersuites are acceptable to the server, the server
+      non-FFDHE cipher suites are acceptable to the server, the server
       MUST end the connection with a fatal TLS alert of type
       insufficient_security(71).
       </t>
       <t>
-      If at least one FFDHE ciphersuite is present in the client
-      ciphersuite list, and the Supported Groups extension is either
+      If at least one FFDHE cipher suite is present in the client
+      cipher suite list and the Supported Groups extension is either
       absent from the ClientHello entirely or contains no FFDHE groups
-      (i.e. no codepoints between 256 and 511 inclusive), then the
+      (i.e., no codepoints between 256 and 511, inclusive), then the
       server knows that the client is not compatible with this
       document.  In this scenario, a server MAY select a
-      non-FFDHE ciphersuite, or MAY select an FFDHE ciphersuite and
+      non-FFDHE cipher suite, or it MAY select an FFDHE cipher suite and
       offer an FFDHE group of its choice to the client as part of a
       traditional ServerKeyExchange.
       </t>
 
       <t>A compatible TLS server that receives the Supported Groups
-      extension with FFDHE codepoints in it, and which selects an
-      FFDHE ciphersuite MUST select one of the client's offered
+      extension with FFDHE codepoints in it and that selects an
+      FFDHE cipher suite MUST select one of the client's offered
       groups.  The server indicates the choice of group to the client
       by sending the group's parameters as usual in the
-      ServerKeyExchange as described in section 7.4.3 of <xref
+      ServerKeyExchange as described in Section 7.4.3 of <xref
       target="RFC5246"/>.
       </t>
 
@@ -376,32 +358,32 @@
       offered by a compatible client.
       </t>
 
-      <t>A TLS server MUST NOT select an FFDHE ciphersuite if the
+      <t>A TLS server MUST NOT select an FFDHE cipher suite if the
       client did not offer one, even if the client offered an FFDHE
       group in the Supported Groups extension.
       </t>
 
       <t>
-        If a non-anonymous FFDHE ciphersuite is selected, and the TLS
+        If a non-anonymous FFDHE cipher suite is selected and the TLS
         client has used this extension to offer an FFDHE group of
         comparable or greater strength than the server's public key,
         the server SHOULD select an FFDHE group at least as strong as
         the server's public key.  For example, if the server has a
-        3072-bit RSA key, and the client offers only ffdhe2048 and
+        3072-bit RSA key and the client offers only ffdhe2048 and
         ffdhe4096, the server SHOULD select ffdhe4096.
       </t>
 
-      <t>When an FFDHE ciphersuite is selected, and the client sends
+      <t>When an FFDHE cipher suite is selected and the client sends
       a ClientKeyExchange, the server MUST verify that 1 &lt; dh_Yc
       &lt; dh_p - 1.  If dh_Yc is out of range, the server MUST
-      terminate the connection with fatal handshake_failure(40) alert.
+      terminate the connection with a fatal handshake_failure(40) alert.
       </t>
 
     </section>
     <section anchor="optimizations" title="Optimizations">
       <t>In a key exchange with a successfully negotiated known FFDHE
       group, both peers know that the group in question uses a safe
-      prime as a modulus, and that the group in use is of size p-1 or
+      prime as a modulus and that the group in use is of size p-1 or
       (p-1)/2.  This allows at least three optimizations that can be
       used to improve performance.
       </t>
@@ -431,18 +413,18 @@
           their secret exponent from a smaller range, doing fewer
           multiplications, while retaining the same level of overall
           security.  Each named group indicates its approximate
-          security level, and provides a lower-bound on the range of
+          security level and provides a lower bound on the range of
           secret exponents that should preserve it.  For example,
-          rather than doing 2*2*3072 multiplications for a ffdhe3072
+          rather than doing 2*2*3072 multiplications for an ffdhe3072
           handshake, each peer can choose to do 2*2*275
           multiplications by choosing their secret exponent from the
-          range [2^274,2^275] (that is, a m-bit integer where m is at
+          range [2^274,2^275] (that is, an m-bit integer where m is at
           least 275) and still keep the same approximate security
           level.
         </t>
         <t>
-          A similar short-exponent approach is suggested in SSH's
-          Diffie-Hellman key exchange (See section 6.2 of <xref
+          A similar short-exponent approach is suggested in a Secure SHell (SSH)
+          Diffie-Hellman key exchange (see Section 6.2 of <xref
           target="RFC4419"/>).
         </t>
       </section>
@@ -450,7 +432,7 @@
         <t>
           Peers wishing to further accelerate FFDHE key exchange can
           also pre-compute a table of powers of the generator of a
-          known group.  This is a memory vs. time tradeoff, and it
+          known group.  This is a memory vs. time trade-off, and it
           only accelerates the first exponentiation of the ephemeral
           DH exchange (the fixed-base exponentiation).  The
           variable-base exponentiation (using the peer's public
@@ -464,29 +446,29 @@
         may contain some ECDHE groups and some FFDHE groups.  These
         SHOULD be ranked in the order preferred by the client.
         </t>
-        <t>However, the ClientHello also contains list of desired
-        ciphersuites, also ranked in preference order.  This presents
+        <t>However, the ClientHello also contains a list of desired
+        cipher suites, also ranked in preference order.  This presents
         the possibility of conflicted preferences.  For example, if
-        the ClientHello contains a CipherSuite with two choices in
+        the ClientHello contains a cipher_suite field with two choices in
         order &lt;TLS_DHE_RSA_WITH_AES_128_CBC_SHA,
         TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA&gt; and the Supported Groups
-        Extension contains two choices in order
-        &lt;secp256r1,ffdhe3072&gt; then there is a clear
+        extension contains two choices in order
+        &lt;secp256r1,ffdhe3072&gt;, then there is a clear
         contradiction.  Clients SHOULD NOT present such a
         contradiction since it does not represent a sensible ordering.
-        A server that encounters such an contradiction when selecting
+        A server that encounters such a contradiction when selecting
         between an ECDHE or FFDHE key exchange mechanism while trying
         to respect client preferences SHOULD give priority to the
         Supported Groups extension (in the example case, it should select
-        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA with secp256r1), but MAY
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA with secp256r1) but MAY
         resolve the contradiction any way it sees fit.
         </t>
         <t>More subtly, clients MAY interleave preferences between
-        ECDHE and FFDHE groups, for example if stronger groups are
+        ECDHE and FFDHE groups; for example, if stronger groups are
         preferred regardless of cost, but weaker groups are
-        acceptable, the Supported Groups extension could consist of:
+        acceptable, the Supported Groups extension could consist of
         &lt;ffdhe8192,secp384p1,ffdhe3072,secp256r1&gt;.  In this
-        example, with the same CipherSuite offered as the previous
+        example, with the same cipher_suite field offered as the previous
         example, a server configured to respect client preferences and
         with support for all listed groups SHOULD select
         TLS_DHE_RSA_WITH_AES_128_CBC_SHA with ffdhe8192.  A server
@@ -498,34 +480,79 @@
       
     </section>
 
-    <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>
-        Thanks to Fedor Brunner, Dave Fergemann, Niels Ferguson, Sandy
-        Harris, Tero Kivinen, Watson Ladd, Nikos Mavrogiannopolous,
-        Niels M&#246;ller, Bodo Moeller, Kenny Paterson, Eric
-        Rescorla, Tom Ritter, Rene Struik, Martin Thomson, Sean
-        Turner, and other members of the TLS Working Group for their
-        comments and suggestions on this draft.  Any mistakes here are
-        not theirs.
-      </t>
-    </section>
 
-    <!-- Possibly a 'Contributors' section ... -->
+<!-- [rfced]  The following questions are IANA related.  Please let us know
+how these issues should be resolved.
+
+a) Note that IANA included the following note in an email about this document
+dated 2015-06-19. Where possible, we have updated the document to address
+these updates. However, some of the updates are not clear to us.  Please
+review carefully and let us know how the text is to be updated.
+
+NOTE: Actions 4 and 5 aren't included in the IANA Considerations section
+yet. The authors have agreed to add some text.
+
+ACTION 4:
+
+IANA has changed the name of the EC Named Curve Registry to "Supported Groups
+Registry" and added this note: 
+
+Note
+Renamed from "EC Named Curve Registry"
+
+Please see
+http://www.iana.org/assignments/tls-parameters
+
+
+ACTION 5:
+
+In the Extensions Type registry, IANA has renamed and added a reference for
+value 10. The entry now reads
+
+10supported_groups (renamed from
+"elliptic_curves")[RFC4492][RFC-ietf-tls-negotiated-ff-dhe-10]
+
+Please see
+http://www.iana.org/assignments/tls-extensiontype-values
+
+
+b) We see instances of "NamedCurve registry" and "Named Curve registry" in
+Section 2 and Appendix A in the document. Should these be updated to "EC Named
+Curve Registry" or "Supported Groups Registry"? 
+
+
+c) Should this sentence read "Supported Groups Registry" rather than "registry"?
+
+   New named groups SHOULD NOT be added to the registry
+   without consideration of the cost of browser fingerprinting.
+
+
+d) Is the title of Appendix A correct?
+
+Original
+Appendix A.  Named Group Registry
+
+Perhaps
+Appendix A.  Supported Groups Registry
+
+Or
+Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
+-->
 
     <section anchor="IANA" title="IANA Considerations">
       <t>
-        IANA maintains the registry currently known as EC Named Curves
-        (originally defined in <xref target="RFC4492"/> and updated by
-        <xref target="RFC7027"/>) at <eref
-        target="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8"/>.
+   This document renames the "EC Named Curve Registry" (originally 
+   defined in <xref target="RFC4492"/> and updated by <xref
+   target="RFC7027"/>) to the "Supported 
+   Groups Registry". See &lt;https://www.iana.org/assignments/tls-parameters&gt;.
       </t>
       <t>
-        This document expands the semantics of this registry slightly,
+        This document expands the semantics of this registry 
         to include groups based on finite fields in addition to groups
-        based on elliptic curves.  IANA should add a range designation
-        to that registry, indicating that values from 256-511
+        based on elliptic curves.  IANA has added a range designation
+        to the registry, indicating that values from 256-511
         (inclusive) are set aside for "Finite Field Diffie-Hellman
-        groups", and that all other entries in the registry are
+        groups" and that all other entries in the registry are
         "Elliptic curve groups".
       </t>
       <t>
@@ -534,13 +561,14 @@
         defined in <xref target="named_group_registry"/>.
       </t>
       <t>
-        In addition, the four highest codepoints in this range
-        (508-511, inclusive) are designated for PRIVATE USE by peers
-        who have privately-developed Finite Field Diffie-Hellman
+        In addition, the four highest codepoints in the range
+        508-511, inclusive, are designated for Private Use <xref
+	target="RFC5226"/> by peers
+        who have privately developed Finite Field Diffie-Hellman
         groups that they wish to signal internally.
       </t>
       <t>
-        The updated registry section should be as follows:
+        The updated registry section is as follows:
       </t>
 
       <texttable align="left">
@@ -552,66 +580,72 @@
         <c>256</c>
         <c>ffdhe2048</c>
         <c>Y</c>
-        <c>[this document]</c>
+        <c>RFC 7919</c>
 
         <c>257</c>
         <c>ffdhe3072</c>
         <c>Y</c>
-        <c>[this document]</c>
+        <c>RFC 7919</c>
 
         <c>258</c>
         <c>ffdhe4096</c>
         <c>Y</c>
-        <c>[this document]</c>
+        <c>RFC 7919</c>
 
         <c>259</c>
         <c>ffdhe6144</c>
         <c>Y</c>
-        <c>[this document]</c>
+        <c>RFC 7919</c>
 
         <c>260</c>
         <c>ffdhe8192</c>
         <c>Y</c>
-        <c>[this document]</c>
+        <c>RFC 7919</c>
 
-        <c>508-511 (inclusive)</c>
-        <c>PRIVATE USE</c>
+        <c>508-511</c>
+        <c>Private Use</c>
         <c>-</c>
-        <c>-</c>
+        <c>RFC 7919</c>
       </texttable> 
 
-   </section>
+      <t>IANA has also renamed the "elliptic_curves" extension as
+      "supported_groups" and added a reference
+      to this document in the "ExtensionType Values" registry. See
+      &lt;http://www.iana.org/assignments/tls-extensiontype-values&gt;.
+      </t>
+
+    </section>
 
     <section anchor="Security" title="Security Considerations">
-      <section title="Negotiation resistance to active attacks">
+      <section title="Negotiation Resistance to Active Attacks">
         <t>
           Because the contents of the Supported Groups extension are hashed
-          in the finished message, an active MITM that tries to filter
+          in the Finished message, an active Man in the Middle (MITM) that tries to filter
           or omit groups will cause the handshake to fail, but
-          possibly not before getting the peer to do something they
+          possibly not before getting the peer to do something it
           would not otherwise have done.
         </t>
         <t>
           An attacker who impersonates the server can try to do any of
           the following:
-          <list>
+          <list style="symbols">
             <t>
               Pretend that a non-compatible server is actually capable
-              of this extension, and select a group from the client's
+              of this extension and select a group from the client's
               list, causing the client to select a group it is willing
               to negotiate.  It is unclear how this would be an
               effective attack.
             </t>
             <t>
               Pretend that a compatible server is actually
-              non-compatible by negotiating a non-FFDHE ciphersuite. This
-              is no different than MITM ciphersuite filtering.
+              non-compatible by negotiating a non-FFDHE cipher suite. This
+              is no different than MITM cipher suite filtering.
             </t>
             <t>
               Pretend that a compatible server is actually
-              non-compatible by negotiating a DHE ciphersuite, with a
+              non-compatible by negotiating a DHE cipher suite with a
               custom (perhaps weak) group selected by the attacker.
-              This is no worse than the current scenario, and would
+              This is no worse than the current scenario and would
               require the attacker to be able to sign the
               ServerDHParams, which should not be possible without
               access to the server's secret key.
@@ -621,84 +655,85 @@
         <t>
           An attacker who impersonates the client can try to do the
           following:
-          <list>
+          <list style="symbols">
             <t>
               Pretend that a compatible client is not compatible
-              (e.g., by not offering the Supported Groups extension, or by
+              (e.g., by not offering the Supported Groups extension or by
               replacing the Supported Groups extension with one that
               includes no FFDHE groups).  This could cause the server
-              to negotiate a weaker DHE group during the handshake, or
-              to select a non-FFDHE ciphersuite, but it would fail to
+              to negotiate a weaker DHE group during the handshake or
+              to select a non-FFDHE cipher suite, but it would fail to
               complete during the final check of the Finished message.
             </t>
             <t>
               Pretend that a non-compatible client is compatible
-              (e.g., by adding the Supported Groups extension, or by
+              (e.g., by adding the Supported Groups extension or by
               adding FFDHE groups to the extension).  This could cause
               the server to select a particular named group in the
-              ServerKeyExchange, or to avoid selecting an FFDHE
-              ciphersuite.  The peers would fail to compute the final
+              ServerKeyExchange or to avoid selecting an FFDHE
+              cipher suite.  The peers would fail to compute the final
               check of the Finished message.
             </t>
             <t>
               Change the list of groups offered by the client (e.g., by
               removing the stronger of the set of groups offered).  This
               could cause the server to negotiate a weaker group than
-              desired, but again should be caught by the check in the
+              desired, but again, should be caught by the check in the
               Finished message.
             </t>
           </list>
         </t>
       </section>
-      <section title="Group strength considerations">
+      <section title="Group Strength Considerations">
         <t>TLS implementations using FFDHE key exchange should
         consider the strength of the group they negotiate.  The
         strength of the selected group is one of the factors that
-        define the connection's resiliance against attacks on the
+        define the connection's resilience against attacks on the
         session's confidentiality and integrity, since the session
         keys are derived from the DHE handshake.
         </t>
         <t>While attacks on integrity must generally happen while the
         session is in progress, attacks against session
-        confidentiality can happen significantly later, if the entire
+        confidentiality can happen significantly later if the entire
         TLS session is stored for offline analysis.  Therefore, FFDHE
         groups should be selected by clients and servers based on
-        confidentiality guarantees they need.  Sessions which need
+        confidentiality guarantees they need.  Sessions that need
         extremely long-term confidentiality should prefer stronger
         groups.
         </t>
         <t><xref target="ENISA"/> provides rough estimates of group
-        resistance to attack, and recommends that forward-looking
+        resistance to attack and recommends that forward-looking
         implementations ("future systems") should use FFDHE group
         sizes of at least 3072 bits.  ffdhe3072 is intended for use in
         these implementations.
         </t>
+
         <t>
           Other sources (e.g., <xref target="NIST"/>) estimate the
           security levels of the DLOG problem to be slightly more
           difficult than <xref target="ENISA"/>.  This document's
           suggested minimum exponent sizes in <xref
           target="named_group_registry"/> for implementations that use
-          the short exponents optimization (<xref
+          the short-exponent optimization (<xref
           target="short_exponents"/>) are deliberately conservative to
           account for the range of these estimates.
         </t>
       </section>
-      <section title="Finite-Field DHE only">
+      <section title="Finite Field DHE Only">
         <t>
-          Note that this document specifically targets only finite
-          field-based Diffie-Hellman ephemeral key exchange
+          Note that this document specifically targets only
+          finite field-based Diffie-Hellman ephemeral key exchange
           mechanisms.  It does not cover the non-ephemeral DH key
-          exchange mechanisms, nor does it address elliptic curve DHE
-          (ECDHE) key exchange, which is defined in <xref
+          exchange mechanisms, nor does it address
+          ECDHE key exchange, which is defined in <xref
           target="RFC4492"/>.
         </t>
         <t>
           Measured by computational cost to the TLS peers, ECDHE appears today to
-          offer much a stronger key exchange mechanism than FFDHE.
+          offer a much stronger key exchange mechanism than FFDHE.
         </t>
       </section>
-      <section title="Deprecating weak groups">
+      <section title="Deprecating Weak Groups">
         <t>
           Advances in hardware or in finite field cryptanalysis may
           cause some of the negotiated groups to not provide the
@@ -709,28 +744,29 @@
         </t>
         <t>
           Revisions of this document should mark
-          known-weak groups as explicitly deprecated for use in TLS,
+          known weak groups as explicitly deprecated for use in TLS
           and should update the estimated work factor needed to break
-          the group, if the cryptanalysis has changed.
+          the group if the cryptanalysis has changed.
           Implementations that require strong confidentiality and
           integrity guarantees should avoid using deprecated groups
           and should be updated when the estimated security margins
           are updated.
         </t>
       </section>
-      <section anchor="choice_of_groups" title="Choice of groups">
+      <section anchor="choice_of_groups" title="Choice of Groups">
         <t>
-          <xref target="STRONGSWAN-IKE">Other lists of named finite
-          field Diffie-Hellman groups</xref> exist.  This draft
+          <xref target="STRONGSWAN-IKE">Other lists of named
+          finite field Diffie-Hellman groups</xref> exist.  This document
           chooses to not reuse them for several reasons:
-          <list>
+          <list style="symbols">
             <t>
               Using the same groups in multiple protocols increases
               the value for an attacker with the resources to crack
               any single group.
             </t>
             <t>
-              The IKE groups include weak groups like MODP768 which
+              The Internet Key Exchange Protocol (IKE) groups include weak
+	      groups like MODP768 that
               are unacceptable for secure TLS traffic.
             </t>
             <t>
@@ -744,72 +780,82 @@
           </list>
         </t>
       </section>
-      <section title="Timing attacks">
+      <section title="Timing Attacks">
         <t>
           Any implementation of finite field Diffie-Hellman key
           exchange should use constant-time modular-exponentiation
           implementations.  This is particularly true for those
-          implementations that ever re-use DHE secret keys (so-called
+          implementations that ever reuse DHE secret keys (so-called
           "semi-static" ephemeral keying) or share DHE secret keys
           across a multiple machines (e.g., in a load-balancer
           situation).
         </t>
       </section>
-      <section title="Replay attacks from non-negotiated FFDHE">
+      <section title="Replay Attacks from Non-negotiated FFDHE">
         <t>
           <xref target="SECURE-RESUMPTION" />, <xref
           target="CROSS-PROTOCOL"/>, and <xref
           target="SSL3-ANALYSIS"/> all show a malicious peer using a
           bad FFDHE group to maneuver a client into selecting a
-          pre-master secret of the peer's choice, which can be
-          replayed to another server using a non-FFDHE key exchange, and
+          premaster secret of the peer's choice, which can be
+          replayed to another server using a non-FFDHE key exchange and
           can then be bootstrapped to replay client authentication.
         </t>
         <t>
           To prevent this attack (barring the fixes proposed in <xref
           target="SESSION-HASH"/>), a client would need not only to
-          implement this draft, but also to reject non-negotiated
-          FFDHE ciphersuites whose group structure it cannot afford to
+          implement this document, but also to reject non-negotiated
+          FFDHE cipher suites whose group structure it cannot afford to
           verify.  Such a client would need to abort the initial
           handshake and reconnect to the server in question without
-          listing any FFDHE ciphersuites on the subsequent connection.
+          listing any FFDHE cipher suites on the subsequent connection.
         </t>
         <t>
-          This tradeoff may be too costly for most TLS clients today,
+          This trade-off may be too costly for most TLS clients today
           but may be a reasonable choice for clients performing client
-          certificate authentication, or who have other reason to be
-          concerned about server-controlled pre-master secrets.
+          certificate authentication or for clients who have other reasons to be
+          concerned about server-controlled premaster secrets.
         </t>
       </section>
       <section title="Forward Secrecy">
+
+<!-- [rfced] Should "if when" in this sentence read simply "if" or "when"?    
+
+Original
+One of the main reasons to prefer FFDHE ciphersuites is Forward
+Secrecy, the ability to resist decryption even if when the
+endpoint's long-term secret key (usually RSA) is revealed in the
+future.
+-->   
+
         <t>One of the main reasons to prefer FFDHE ciphersuites is
-        Forward Secrecy, the ability to resist decryption even if when
+        forward secrecy, the ability to resist decryption even if when
         the endpoint's long-term secret key (usually RSA) is revealed
         in the future.
         </t>
         <t>This property depends on both sides of the connection
         discarding their ephemeral keys promptly.  Implementations
         should wipe their FFDHE secret key material from memory as
-        soon as it is no longer needed, and should never store it in
+        soon as it is no longer needed and should never store it in
         persistent storage.
         </t>
         <t>Forward secrecy also depends on the strength of the
         Diffie-Hellman group; using a very strong symmetric cipher
-        like AES256 with a forward-secret ciphersuite, but generating
+        like AES256 with a forward-secret cipher suite but generating
         the keys with a much weaker group like dhe2048 simply moves
         the adversary's cost from attacking the symmetric cipher to
-        attacking the dh_Ys or dh_Yc ephemeral keyshares.
+        attacking the dh_Ys or dh_Yc ephemeral key shares.
         </t>
         <t>If the goal is to provide forward secrecy, attention should
-        be paid to all parts of the ciphersuite selection process,
+        be paid to all parts of the cipher suite selection process,
         both key exchange and symmetric cipher choice.
         </t>
       </section>
       <section title="False Start">
         <t>
           Clients capable of TLS False Start <xref
-          target="FALSE-START"/> may receive a proposed FFDHE group
-          from a server that is attacker-controlled.  In particular,
+          target="RFC7918"/> may receive a proposed FFDHE group
+          from a server that is attacker controlled.  In particular,
           the attacker can modify the ClientHello to strip the
           proposed FFDHE groups, which may cause the server to offer a
           weaker FFDHE group than it should, and this will not be
@@ -822,27 +868,29 @@
           Clients should have their own classification of FFDHE groups
           that are "cryptographically strong" in the same sense
           described in the description of symmetric ciphers in <xref
-          target="FALSE-START"/>, and SHOULD offer at least one of
+          target="RFC7918"/> and SHOULD offer at least one of
           these in the initial handshake if they contemplate using the
-          False Start protocol modification with an FFDHE ciphersuite.
+          False Start protocol modification with an FFDHE cipher suite.
         </t>
         <t>
           Compatible clients performing a full handshake MUST NOT use
           the False Start protocol modification if the server selects
-          an FFDHE ciphersuite but sends a group that is not
+          an FFDHE cipher suite but sends a group that is not
           cryptographically strong from the client's perspective.
         </t>
       </section>
     </section>
 
     <section anchor="Privacy" title="Privacy Considerations">
-      <section anchor="Client-Fingerprinting" title="Client fingerprinting">
+      <section anchor="Client-Fingerprinting" title="Client Fingerprinting">
         <t>
           This extension provides a few additional bits of information
-          to distinguish between classes of TLS clients (see e.g.
+          to distinguish between classes of TLS clients (e.g., see
           <xref target="PANOPTICLICK"/>).  To minimize this sort of
           fingerprinting, clients SHOULD support all named groups at
-          or above their minimum security threshhold.  New named
+          or above their minimum security threshold. 
+
+           New named
           groups SHOULD NOT be added to the registry without
           consideration of the cost of browser fingerprinting.
         </t>
@@ -850,41 +898,27 @@
     </section>
   </middle>
 
-  <!--  *****BACK MATTER ***** -->
-
   <back>
-    <!-- References split into informative and normative -->
-
-    <!-- There are 2 ways to insert reference entries from the citation libraries:
-     1. define an ENTITY at the top, and use "ampersand character"RFC2629; here (as shown)
-     2. simply use a PI "less than character"?rfc include="reference.RFC.2119.xml"?> here
-        (for I-Ds: include="reference.I-D.narten-iana-considerations-rfc2434bis.xml")
-
-     Both are cited textually in the same manner: by using xref elements.
-     If you use the PI option, xml2rfc will, by default, try to find included files in the same
-     directory as the including file. You can also define the XML_LIBRARY environment variable
-     with a value containing a set of directories to search.  These can be either in the local
-     filing system or remote ones accessed by http (http://domain/dir/... ).-->
-
     <references title="Normative References">
-      <!--?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
-      &RFC2119;
 
-      &RFC4492;
+<?rfc include="reference.RFC.2119"?>
 
-      &RFC5226;
+<?rfc include="reference.RFC.4492"?>
 
-      &RFC5246;
+<?rfc include="reference.RFC.5226"?>
 
-      <reference anchor="FALSE-START">
+<?rfc include="reference.RFC.5246"?>
+
+
+      <reference anchor="RFC7918" target='http://www.rfc-editor.org/info/rfc7918'>
         <front>
           <title>Transport Layer Security (TLS) False Start</title>
           <author initials="A." surname="Langley" fullname="Adam Langley"><organization>Google</organization></author>
           <author initials="N." surname="Modadugu" fullname="Nagendra Modadugu"><organization>Independent</organization></author>
           <author initials="B." surname="Moeller" fullname="Bodo Moeller"><organization>Google</organization></author>
-          <date month="November" year="2014"/>
+          <date month="June" year="2016"/>
         </front>
-        <seriesInfo name="Work in Progress," value="draft-bmoeller-tls-falsestart-01"/>
+<seriesInfo name='DOI' value='10.17487/RFC7918' />
       </reference>
 
       
@@ -892,40 +926,43 @@
 
     <references title="Informative References">
 
-      &RFC2246;
-      
-      &RFC3526;
+<?rfc include="reference.RFC.2246"?>
+<?rfc include="reference.RFC.3526"?>
+<?rfc include="reference.RFC.4346"?>
+<?rfc include="reference.RFC.4419"?>
+<?rfc include="reference.RFC.7027"?>
 
-      &RFC4346;
-
-      &RFC4419;
-
-      &RFC7027;
-
-
-
-      <reference anchor="ENISA"
-                 target="http://www.enisa.europa.eu/activities/identity-and-trust/library/deliverables/algorithms-key-sizes-and-parameters-report">
+     <reference anchor="ENISA"
+              target="http://www.enisa.europa.eu/activities/identity-and-trust/library/deliverables/algorithms-key-sizes-and-parameters-report">
         <front>
-          <title>Algorithms, Key Sizes and Parameters Report, version 1.0</title>
-
+          <title>Algorithms, Key Sizes and Parameters Report</title>
           <author>
-            <organization>European Union Agency for Network and Information Security Agency</organization>
+            <organization>European Union Agency for Network and Information Security (ENISA)</organization>
           </author>
-
           <date month="October" year="2013" />
         </front>
       </reference>
+
+
+<!--[rfced] The URL in this reference entry did not work. Is another URL
+    available? Perhaps
+    http://cordis.europa.eu/docs/projects/cnect/6/216676/080/deliverables/002-DSPA20.pdf?
+
+   [ECRYPTII]
+              European Network of Excellence in Cryptology II, "ECRYPT
+              II Yearly Report on Algorithms and Keysizes (2011-2012)",
+              September 2012,
+              <http://www.ecrypt.eu.org/documents/D.SPA.20.pdf>.
+-->
 
       <reference anchor="ECRYPTII"
                  target="http://www.ecrypt.eu.org/documents/D.SPA.20.pdf">
         <front>
           <title>ECRYPT II Yearly Report on Algorithms and Keysizes (2011-2012)</title>
-
           <author>
-            <organization>European Network of Excellence in Cryptology II</organization>
+            <organization>European Network of Excellence in Cryptology II
+	    </organization>
           </author>
-
           <date month="September" year="2012" />
         </front>
       </reference>
@@ -933,16 +970,13 @@
       <reference anchor="STRONGSWAN-IKE"
                  target="https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2CipherSuites#Diffie-Hellman-Groups">
         <front>
-          <title>Diffie Hellman Groups in IKEv2 Cipher Suites</title>
-
+          <title>IKEv2 Cipher Suites: Diffie Hellman Groups</title>
           <author initials="T." surname="Brunner" fullname="Tobias Brunner">
             <organization>Strongswan</organization>
           </author>
-
           <author initials="A." surname="Steffen" fullname="Andreas Steffen">
             <organization>Strongswan</organization>
           </author>
-
           <date month="October" year="2013" />
         </front>
       </reference>
@@ -951,7 +985,6 @@
                  target="http://www.cosic.esat.kuleuven.be/publications/article-2216.pdf">
         <front>
           <title>A Cross-Protocol Attack on the TLS Protocol</title>
-
           <author initials="N." surname="Mavrogiannopolous" fullname="Nikos Mavrogiannopoulos">
             <organization>KU Lueven</organization>
           </author>
@@ -964,103 +997,156 @@
           <author initials="B." surname="Preneel" fullname="Bart Preneel">
             <organization>KU Lueven</organization>
           </author>
-
           <date month="October" year="2012" />
         </front>
+	<seriesInfo name="In Proceedings of the 2012 ACM Conference on" value="Computer and Communications Security"/>
+	<seriesInfo name="DOI" value="10.1145/2382196.2382206"/>
       </reference>
 
       <reference anchor="SSL3-ANALYSIS"
                  target="https://www.schneier.com/paper-ssl.pdf">
         <front>
           <title>Analysis of the SSL 3.0 protocol</title>
-
           <author initials="B." surname="Schneier" fullname="Bruce Schneier">
             <organization>Counterpane Systems</organization>
           </author>
-
           <author initials="D." surname="Wagner" fullname="David Wagner">
             <organization>University of California, Berkeley</organization>
           </author>
-
           <date year="1996" />
         </front>
-      </reference>
+	<seriesInfo name="In Proceedings of the Second UNIX Workshop on"
+		    value="Electronic Commerce"/>
+	      </reference>
 
       <reference anchor="SECURE-RESUMPTION"
                  target="https://secure-resumption.com/">
         <front>
           <title>Triple Handshakes Considered Harmful: Breaking and Fixing Authentication over TLS</title>
-
           <author initials="A." surname="Delignat-Lavaud" fullname="Antoine Delignat-Lavaud">
             <organization>INRIA</organization>
           </author>
-
           <author initials="K." surname="Bhargavan" fullname="Karthikeyan Bhargavan">
             <organization>INRIA</organization>
           </author>
-
           <author initials="A." surname="Pironti" fullname="Alfredo Pironti">
             <organization>INRIA</organization>
           </author>
-
           <date month="March" year="2014" />
         </front>
+	<seriesInfo name="2014 IEEE Symposium on Security" value="and Privacy"/>
+	<seriesInfo name="DOI" value="10.1109/SP.2014.14" />
       </reference>
 
-      <reference anchor="SESSION-HASH"
-                 target="https://secure-resumption.com/draft-bhargavan-tls-session-hash-00.txt">
-        <front>
-          <title>Triple Handshakes Considered Harmful: Breaking and Fixing Authentication over TLS</title>
 
-          <author initials="K." surname="Bhargavan" fullname="Karthikeyan Bhargavan">
-            <organization>INRIA</organization>
-          </author>
+<!--[rfced] FYI: We have updated the following reference per Section 4.8.6.4
+of RFC 7322 ("Referencing Internet-Drafts").
 
-          <author initials="A." surname="Delignat-Lavaud" fullname="Antoine Delignat-Lavaud">
-            <organization>INRIA</organization>
-          </author>
+Original
+   [SESSION-HASH]
+              Bhargavan, K., Delignat-Lavaud, A., Pironti, A., Langley,
+              A., and M. Ray, "Triple Handshakes Considered Harmful:
+              Breaking and Fixing Authentication over TLS", March 2014,
+              <https://secure-resumption.com/draft-bhargavan-tls-
+              session-hash-00.txt>.
 
-          <author initials="A." surname="Pironti" fullname="Alfredo Pironti">
-            <organization>INRIA</organization>
-          </author>
+Updated
+   [SESSION-HASH]
+              Bhargavan, K., Delignat-Lavaud, A., Pironti, A., Langley,
+              A., and M. Ray, "Transport Layer Security (TLS) Session
+              Hash and Extended Master Secret Extension", Work in
+              Progress, draft-bhargavan-tls-session-hash-01, July 2014.
+--> 
 
-          <author initials="A." surname="Langley" fullname="Adam Langley">
-            <organization>Google</organization>
-          </author>
+<!-- draft-bhargavan-tls-session-hash-01: I-D Expired -->
+<reference anchor='SESSION-HASH'>
+<front>
+<title>Transport Layer Security (TLS) Session Hash and Extended Master Secret Extension</title>
+<author initials='K' surname='Bhargavan' fullname='Karthikeyan Bhargavan'>
+    <organization />
+</author>
+<author initials='A' surname='Delignat-Lavaud' fullname='Antoine Delignat-Lavaud'>
+    <organization />
+</author>
+<author initials='A' surname='Pironti' fullname='Alfredo Pironti'>
+    <organization />
+</author>
+<author initials='A' surname='Langley' fullname='Adam Langley'>
+    <organization />
+</author>
+<author initials='M' surname='Ray' fullname='Marsh Ray'>
+    <organization />
+</author>
+<date month='July' year='2014' />
+</front>
+<seriesInfo name='Work in Progress,' value='draft-bhargavan-tls-session-hash-01' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-bhargavan-tls-session-hash-01.txt' />
+</reference>
 
-          <author initials="M." surname="Ray" fullname="Marsh Ray">
-            <organization>Microsoft</organization>
-          </author>
 
-          <date month="March" year="2014" />
-        </front>
-      </reference>
+<!-- [rfced]  We have updated the title of the following reference entry to
+"Panopticlick: Is Your Browser Safe against Tracking" per the title of
+the website in the reference entry. Please let us know any objections.
+
+Original
+   [PANOPTICLICK]
+              Electronic Frontier Foundation, "Panopticlick: How Unique
+              - and Trackable - Is Your Browser?", 2010,
+              <https://panopticlick.eff.org/>.
+
+Updated
+   [PANOPTICLICK]
+              Electronic Frontier Foundation, "Panopticlick: Is your browser
+	      safe against tracking", <https://panopticlick.eff.org/>.
+-->
 
       <reference anchor="PANOPTICLICK"
                  target="https://panopticlick.eff.org/">
         <front>
-          <title>Panopticlick: How Unique - and Trackable - Is Your Browser?</title>
+          <title>Panopticlick: Is your browser safe against tracking?</title>
           <author>
             <organization>Electronic Frontier Foundation</organization>
           </author>
-          <date year="2010" />
+          <date />
         </front>
       </reference>
 
+<!--[rfced] We note that the following NIST reference has been superseded by
+Revision 4 (see
+http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r4.pdf). Would
+you like to update the reference entry accordingly?
+
+Original
+   [NIST]     National Institute of Standards and Technology, "NIST
+              Special Publication 800-57. Recommendation for key
+              management - Part 1: General (Revision 3)", 2012,
+              <http://csrc.nist.gov/publications/nistpubs/800-57/
+              sp800-57_part1_rev3_general.pdf>.
+
+Perhaps
+   [NIST]     National Institute of Standards and Technology,
+              "Recommendation for Key Management - Part 1: General",
+              NIST Special Publication 800-57, Revision 4,
+              DOI 10.6028/NIST.SP.800-57pt1r4, January 2016,
+              <http://nvlpubs.nist.gov/nistpubs/SpecialPublications/
+              NIST.SP.800-57pt1r4.pdf>.
+-->
       <reference anchor="NIST"
                  target="http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57_part1_rev3_general.pdf">
         <front>
-          <title>NIST Special Publication 800-57. Recommendation for
-          key management – Part 1: General (Revision 3)</title>
+          <title>Recommendation for Key Management - Part 1: General</title>
           <author>
             <organization>National Institute of Standards and Technology</organization>
           </author>
-          <date year="2012" />
+          <date month="July" year="2012" />
         </front>
+	<seriesInfo name="NIST Special Publication 800-57," value="Revision 3"/>
       </reference>
         
 
    </references>
+
 
     <section anchor="named_group_registry" title="Named Group Registry">
       <t>
@@ -1073,12 +1159,12 @@
         should consider <xref target="Client-Fingerprinting"/>.
       </t>
       <t>
-        The primes in these finite field groups are all safe primes,
+        The primes in these finite field groups are all safe primes;
         that is, a prime p is a safe prime when q = (p-1)/2 is also
-        prime.  Where e is the base of the natural logarithm, and
-        square brackets denote the floor operation, the groups which
+        prime.  Where e is the base of the natural logarithm and
+        square brackets denote the floor operation, the groups that
         initially populate this registry are derived for a given
-        bitlength b by finding the lowest positive integer X that
+        bit length b by finding the lowest positive integer X that
         creates a safe prime p where:
       </t>
       <figure>
@@ -1088,8 +1174,8 @@
       </figure>
       <t>
         New additions of FFDHE groups to this registry may use this
-        same derivation (e.g., with different bitlengths) or may choose
-        their parameters in a different way, but must be clear about
+        same derivation (e.g., with different bit lengths) or may choose
+        their parameters in a different way, but they must be clear about
         how the parameters were derived.
       </t>
       <t>
@@ -1098,9 +1184,10 @@
         in <xref target="peercheck"/>.
       </t>
       <section anchor="ffdhe2048" title="ffdhe2048">
-        <t>The 2048-bit group has registry value 256, and is calculated
+        <t>The 2048-bit group has registry value 256 and is calculated
         from the following formula:</t>
-        <t>The modulus is: p = 2^2048 - 2^1984 + {[2^1918 * e] + 560316 } * 2^64 - 1 </t>
+        <t>The modulus is:</t>
+	<t>p = 2^2048 - 2^1984 + {[2^1918 * e] + 560316 } * 2^64 - 1 </t>
         <t>The hexadecimal representation of p is:</t>
         <figure>
         <artwork><![CDATA[
@@ -1143,9 +1230,10 @@
       </section>
 
       <section anchor="ffdhe3072" title="ffdhe3072">
-        <t>The 3072-bit prime has registry value 257, and is calculated
+        <t>The 3072-bit prime has registry value 257 and is calculated
         from the following formula:</t>
-        <t>The modulus is: p = 2^3072 - 2^3008 + {[2^2942 * e] + 2625351} * 2^64 -1</t>
+        <t>The modulus is:</t>
+	<t>p = 2^3072 - 2^3008 + {[2^2942 * e] + 2625351} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
         <figure>
         <artwork><![CDATA[
@@ -1198,9 +1286,10 @@
       </section>
 
       <section anchor="ffdhe4096" title="ffdhe4096">
-        <t>The 4096-bit group has registry value 258, and is calculated
+        <t>The 4096-bit group has registry value 258 and is calculated
         from the following formula:</t>
-        <t>The modulus is: p = 2^4096 - 2^4032 + {[2^3966 * e] + 5736041} * 2^64 - 1</t>
+        <t>The modulus is:</t> 
+	<t>p = 2^4096 - 2^4032 + {[2^3966 * e] + 5736041} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
         <figure>
         <artwork><![CDATA[
@@ -1265,9 +1354,10 @@
         bits.</t>
       </section>
       <section anchor="ffdhe6144" title="ffdhe6144">
-        <t>The 6144-bit group has registry value 259, and is calculated
+        <t>The 6144-bit group has registry value 259 and is calculated
         from the following formula:</t>
-        <t>The modulus is: p = 2^6144 - 2^6080 + {[2^6014 * e] + 15705020} * 2^64 - 1</t>
+        <t>The modulus is:</t>
+	<t>p = 2^6144 - 2^6080 + {[2^6014 * e] + 15705020} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
         <figure>
         <artwork><![CDATA[
@@ -1352,9 +1442,10 @@
         bits.</t>
       </section>
       <section anchor="ffdhe8192" title="ffdhe8192">
-        <t>The 8192-bit group has registry value 260, and is calculated
+        <t>The 8192-bit group has registry value 260 and is calculated
         from the following formula:</t>
-        <t>The modulus is: p = 2^8192 - 2^8128 + {[2^8062 * e] + 10965728} * 2^64 - 1</t>
+        <t>The modulus is:</t>
+	<t>p = 2^8192 - 2^8128 + {[2^8062 * e] + 10965728} * 2^64 - 1</t>
         <t>The hexadecimal representation of p is:</t>
         <figure>
         <artwork><![CDATA[
@@ -1462,5 +1553,14 @@
       </section>
 
     </section>
+<section title="Acknowledgements" numbered="no">
+<t>Thanks to Fedor Brunner, Dave Fergemann, Niels Ferguson, Sandy
+   Harris, Tero Kivinen, Watson Ladd, Nikos Mavrogiannopolous, Niels
+   Moeller, Bodo Moeller, Kenny Paterson, Eric Rescorla, Tom Ritter,
+   Rene Struik, Martin Thomson, Sean Turner, and other members of the
+   TLS Working Group for their comments and suggestions on this document.
+   Any mistakes here are not theirs.</t>
+</section>
+
   </back>
 </rfc>
