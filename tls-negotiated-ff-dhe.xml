@@ -28,7 +28,6 @@ a) Throughout the text, the following terminology appears to be used
 inconsistently. Please review these occurrences and let us know if/how they may be made 
 consistent.  
 
-b) Should "DLOG" be expanded as "discrete logarithm"?
 -->
 
 
@@ -703,7 +702,7 @@ Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
 
         <t>
           Other sources (e.g., <xref target="NIST"/>) estimate the
-          security levels of the DLOG problem to be slightly more
+          security levels of the discrete log (DLOG) problem to be slightly more
           difficult than <xref target="ENISA"/>.  This document's
           suggested minimum exponent sizes in <xref
           target="named_group_registry"/> for implementations that use
