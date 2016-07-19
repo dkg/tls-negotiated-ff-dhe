@@ -460,18 +460,6 @@ review carefully and let us know how the text is to be updated.
 NOTE: Actions 4 and 5 aren't included in the IANA Considerations section
 yet. The authors have agreed to add some text.
 
-ACTION 4:
-
-IANA has changed the name of the EC Named Curve Registry to "Supported Groups
-Registry" and added this note: 
-
-Note
-Renamed from "EC Named Curve Registry"
-
-Please see
-http://www.iana.org/assignments/tls-parameters
-
-
 ACTION 5:
 
 In the Extensions Type registry, IANA has renamed and added a reference for
@@ -509,10 +497,11 @@ Appendix A.  Supported Groups Registry (formerly "EC Named Curve Registry")
 
     <section anchor="IANA" title="IANA Considerations">
       <t>
-   This document renames the "EC Named Curve Registry" (originally 
-   defined in <xref target="RFC4492"/> and updated by <xref
-   target="RFC7027"/>) to the "Supported 
-   Groups Registry". See &lt;https://www.iana.org/assignments/tls-parameters&gt;.
+        This document renames the "EC Named Curve Registry"
+        (originally defined in <xref target="RFC4492"/> and updated by
+        <xref target="RFC7027"/>) to the "Supported Groups
+        Registry". See
+        &lt;https://www.iana.org/assignments/tls-parameters&gt;.
       </t>
       <t>
         This document expands the semantics of this registry 
