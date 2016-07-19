@@ -22,14 +22,6 @@
 
   <front>
 
-<!-- [rfced] Terminology and Acronyms
-
-a) Throughout the text, the following terminology appears to be used 
-inconsistently. Please review these occurrences and let us know if/how they may be made 
-consistent.  
-
--->
-
 
     <title abbrev="Negotiated FFDHE for TLS">Negotiated Finite Field
     Diffie-Hellman Ephemeral Parameters for Transport Layer Security (TLS)</title>
