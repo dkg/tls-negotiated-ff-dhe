@@ -28,8 +28,6 @@ a) Throughout the text, the following terminology appears to be used
 inconsistently. Please review these occurrences and let us know if/how they may be made 
 consistent.  
 
-ClientHello vs. Client Hello
-
 Supported Groups extension vs. "Supported Groups" extension
 
 b) Should "DLOG" be expanded as "discrete logarithm"?
@@ -244,7 +242,7 @@ where "Private Use" is used in the IANA Consideration section.
 
       <t>A client that offers a "Supported Groups" extension
       containing an FFDHE group SHOULD also include at least one FFDHE
-      cipher suite in the Client Hello.</t>
+      cipher suite in the ClientHello.</t>
 
       <t>A client that offers a group MUST be able and willing to
       perform a DH key exchange using that group.</t>
